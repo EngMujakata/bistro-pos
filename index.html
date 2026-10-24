@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#b8321a"><link rel="manifest" href="manifest.json"><title>Bistro POS</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#b8321a"><link rel="manifest" href="manifest.json"><title>spark POS</title>
 <style>
 :root{--ink:#1d2321;--bg:#f1f2ef;--card:#fff;--line:#d9dcd6;--red:#b8321a;--grn:#2f6b4f;--mut:#6a726d;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
@@ -28,7 +28,7 @@ footer{text-align:center;padding:12px;font-size:12px;color:var(--mut)}
 #ld .dots{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);margin:0;padding:15px 20px;background:#fff;border-radius:99px;box-shadow:0 4px 18px #0003}
 #modal.ctr{align-items:center}#modal.lock{cursor:wait}#modal.ctr #mb{border-radius:16px;text-align:center;width:min(300px,90%)}
 </style></head><body>
-<header><img id="logo" hidden alt=""><b id="biz">Bistro POS</b><span class="badge" id="net"></span><span class="badge" id="who"></span><button class="btn gh" id="out" style="padding:4px 10px">Sign out</button></header>
+<header><img id="logo" hidden alt=""><b id="biz">spark POS</b><span class="badge" id="net"></span><span class="badge" id="who"></span><button class="btn gh" id="out" style="padding:4px 10px">Sign out</button></header>
 <nav id="nav"><button data-v="sell" class="on">Sell</button><button data-v="stock" data-r>Stock</button><button data-v="recipes" data-r>Recipes &amp; cost</button><button data-v="shift">Shift &amp; cash-up</button><button data-v="reports" data-r>Reports</button><button data-v="users" data-r>Users</button><button data-v="settings" data-r>Settings</button></nav>
 <main>
 <section id="v-sell" class="on"><div class="sell"><div><div class="grid" id="menu"></div></div>
@@ -49,7 +49,7 @@ footer{text-align:center;padding:12px;font-size:12px;color:var(--mut)}
 <label>Logo</label><input type="file" id="logoIn" accept="image/*"><button class="btn" style="margin-top:10px">Save settings</button></form></div></section>
 <section id="v-reports"><div class="tabs" id="rt"><button data-t="ov">Overview</button><button data-t="stk">Stock levels</button><button data-t="updates">Stock updates</button><button data-t="cash">Cash</button><button data-t="log">Sales</button></div><select id="rg" style="width:auto;margin-bottom:10px"><option value="1">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="0">All time</option></select><div id="rb"></div></section>
 <section id="v-users"><div class="panel"><b>Add user</b><form id="fUser"><div class="fg"><div><label>Name</label><input name="n" required></div><div><label>Role</label><select name="role"><option value="cashier">Cashier (sell and cash up only)</option><option value="admin">Admin (everything)</option></select></div><div><label>Username</label><input name="un" required autocapitalize="none"></div><div><label>Password</label><input name="p" type="password" minlength="4" required></div></div><button class="btn" style="margin-top:10px">Create user</button></form></div><div class="panel" id="ul"></div></section>
-</main><footer>Bistro powered by Electrify Technologies</footer>
+</main><footer>spark powered by Electrify Technologies</footer>
 <div id="ld"><div class="dots"><i></i><i></i><i></i></div></div><div id="modal"><div id="mb"></div></div><div id="toast"></div>
 <div id="login"></div><input type="file" id="phIn" accept="image/*" hidden>
 <script>
@@ -59,11 +59,11 @@ const API_URL='https://script.google.com/macros/s/AKfycbx2aj_p1o0tP3BFAMDoiGz66W
 const CLOUD=/^https?:\/\//.test(API_URL);
 const DEFAULT_ADMIN={id:'user-admin',username:'admin',name:'Administrator',role:'admin',active:true,ts:0,h:'b72166a274a5b2480588639e9a53f9754ec81931dc738c0b6c90bcdf696ee8a3'};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-/* Bistro POS core. Local-first (IndexedDB) with an idempotent outbox. Bistro powered by Electrify Technologies */
+/* spark POS core. Local-first (IndexedDB) with an idempotent outbox. spark powered by Electrify Technologies */
 const $=s=>document.querySelector(s),uid=()=>crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:r&3|8).toString(16)}),usd=n=>'$'+(+n||0).toFixed(2),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const UNITS={kg:['g',1000],g:['g',1],l:['ml',1000],ml:['ml',1],each:['each',1]},METHODS={cash:'Hard cash',swipe:'Card swipe',bank:'Bank transfer',mobile:'Mobile money'};
-let me=null,users=[],PP='80mm',db,items=[],moves=[],sales=[],shift=null,S={biz:'Bistro',rate:32,vat:0,vatp:15,paper:'80mm',logo:''},stock={},cart=[],busy=false,rec=[];
-const open=()=>new Promise((ok,no)=>{const r=indexedDB.open('bistro',2);r.onupgradeneeded=()=>{const d=r.result;['items','moves','sales','shifts','outbox','users'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'k'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+let me=null,users=[],PP='80mm',db,items=[],moves=[],sales=[],shift=null,S={biz:'spark',rate:32,vat:0,vatp:15,paper:'80mm',logo:''},stock={},cart=[],busy=false,rec=[];
+const open=()=>new Promise((ok,no)=>{const r=indexedDB.open('spark',2);r.onupgradeneeded=()=>{const d=r.result;['items','moves','sales','shifts','outbox','users'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'k'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const all=n=>new Promise(r=>{const q=db.transaction(n).objectStore(n).getAll();q.onsuccess=()=>r(q.result)});
 /* ATOMIC: the data rows and ONE outbox record commit in ONE IndexedDB transaction, or nothing is written.
    Resolves only on commit. The batch id is created by the caller, so a retry of the same save reuses it (idempotent). */
@@ -141,7 +141,7 @@ const printDoc=h=>new Promise(r=>{const f=document.createElement('iframe');f.sty
 const page=()=>PP==='A4'?'@page{size:A4;margin:15mm}body{width:100%}':PP==='58mm'?'@page{size:58mm auto;margin:0}body{width:50mm;margin:4mm}':'@page{size:80mm auto;margin:0}body{width:72mm;margin:4mm}';
 const doc=b=>`<!doctype html><meta charset=utf-8><style>${page()}body{font:12px/1.35 monospace;color:#000}.r{display:flex;justify-content:space-between}hr{border:0;border-top:1px dashed #000}.c{text-align:center}img{max-height:50px}</style>${b}`;
 async function printAll(s){const d=new Date(s.at).toLocaleString(),L=s.lines;
- PP=S.paper;const cust=doc(`<div class=c>${S.logo?`<img src="${S.logo}"><br>`:''}<b>${esc(S.biz)}</b><br>Order #${s.no}<br>${d}</div><hr>${L.map(l=>`<div class=r><span>${l.qty} ${esc(l.name)}</span><span>${(l.price).toFixed(2)}</span></div>${l.starchName?`<div>  + ${esc(l.starchName)}</div>`:''}${(l.extraNames||[]).map(x=>`<div>  + ${esc(x)}</div>`).join('')}`).join('')}<hr><div class=r><span>Subtotal</span><span>${s.sub.toFixed(2)}</span></div>${s.vat?`<div class=r><span>VAT ${S.vatp}%</span><span>${s.vat.toFixed(2)}</span></div>`:''}<div class=r><b>TOTAL USD</b><b>${s.total.toFixed(2)}</b></div>${s.cur==='ZiG'?`<div class=r><span>Paid ZiG @${s.rate}</span><span>${(s.total*s.rate).toFixed(2)}</span></div>`:''}<div>Paid by ${METHODS[s.method]}</div><hr><div class=c>Thank you!<br>Bistro powered by Electrify Technologies</div>`);
+ PP=S.paper;const cust=doc(`<div class=c>${S.logo?`<img src="${S.logo}"><br>`:''}<b>${esc(S.biz)}</b><br>Order #${s.no}<br>${d}</div><hr>${L.map(l=>`<div class=r><span>${l.qty} ${esc(l.name)}</span><span>${(l.price).toFixed(2)}</span></div>${l.starchName?`<div>  + ${esc(l.starchName)}</div>`:''}${(l.extraNames||[]).map(x=>`<div>  + ${esc(x)}</div>`).join('')}`).join('')}<hr><div class=r><span>Subtotal</span><span>${s.sub.toFixed(2)}</span></div>${s.vat?`<div class=r><span>VAT ${S.vatp}%</span><span>${s.vat.toFixed(2)}</span></div>`:''}<div class=r><b>TOTAL USD</b><b>${s.total.toFixed(2)}</b></div>${s.cur==='ZiG'?`<div class=r><span>Paid ZiG @${s.rate}</span><span>${(s.total*s.rate).toFixed(2)}</span></div>`:''}<div>Paid by ${METHODS[s.method]}</div><hr><div class=c>Thank you!<br>spark powered by Electrify Technologies</div>`);
  PP=S.kpaper||S.paper;const kit=doc(`<div class=c><b style="font-size:32px">#${s.no}</b><br>KITCHEN ${d}</div><hr>${L.map(l=>`<div><b>${l.qty} x ${esc(l.name)}</b></div>${l.starchName?`<div>  + ${esc(l.starchName)}</div>`:''}${(l.extraNames||[]).map(x=>`<div>  + ${esc(x)}</div>`).join('')}`).join('')}`);
  await printDoc(cust);const k=S.kit||'auto';if(k==='auto')await printDoc(kit);else if(k==='button')await new Promise(r=>{modal('<h3>Kitchen ticket #'+s.no+'</h3><p>Press Print, then choose the kitchen printer in the dialog.</p><button class="btn" id="kp" style="width:100%">Print kitchen ticket</button><button class="btn gh" id="ks" style="width:100%;margin-top:8px">Skip</button>');$('#kp').onclick=async()=>{closeM();await printDoc(kit);r()};$('#ks').onclick=()=>{closeM();r()}})}
 
@@ -213,7 +213,7 @@ addEventListener('online',()=>{pending();refreshUsers().then(()=>sync(true))});a
 /* ---------- install pop-up ---------- */
 let ip=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;ask()});
 function ask(){if(matchMedia('(display-mode:standalone)').matches||localStorage.noInst)return;const ios=/iphone|ipad/i.test(navigator.userAgent);if(!ip&&!ios)return;
- modal(`<h3>Install Bistro POS</h3><p>Open it like an app and keep selling when the network drops.</p>${ios&&!ip?'<p>On iPhone: tap Share, then Add to Home Screen.</p>':''}${ip?'<button class="btn" id="inst" style="width:100%">Install</button>':''}<button class="btn gh" id="no" style="width:100%;margin-top:8px">Not now</button>`);
+ modal(`<h3>Install spark POS</h3><p>Open it like an app and keep selling when the network drops.</p>${ios&&!ip?'<p>On iPhone: tap Share, then Add to Home Screen.</p>':''}${ip?'<button class="btn" id="inst" style="width:100%">Install</button>':''}<button class="btn gh" id="no" style="width:100%;margin-top:8px">Not now</button>`);
  if($('#inst'))$('#inst').onclick=async()=>{closeM();ip.prompt();await ip.userChoice;ip=null};$('#no').onclick=()=>{localStorage.noInst=1;closeM()}}
 
 /* Pull every user from the cloud into IndexedDB (small and fast, separate from the big data pull), so sign-in works offline. */
