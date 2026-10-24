@@ -23,17 +23,21 @@ input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:
 #toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:10}
 footer{text-align:center;padding:12px;font-size:12px;color:var(--mut)}
 .tile img{width:100%;height:72px;object-fit:cover;border-radius:7px}.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.tabs button{padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:#fff;cursor:pointer}.tabs button.on{background:var(--ink);color:#fff}.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}.kpi div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}.kpi b{display:block;font-size:20px}#login{position:fixed;inset:0;background:var(--bg);z-index:20;display:none;align-items:center;justify-content:center;padding:14px}#login form{width:min(360px,100%)}
-.spin{width:38px;height:38px;border:4px solid #ddd;border-top-color:var(--red);border-radius:50%;animation:sp .8s linear infinite;margin:10px auto}@keyframes sp{to{transform:rotate(360deg)}}#modal.ctr{align-items:center}#modal.lock{cursor:wait}#modal.ctr #mb{border-radius:16px;text-align:center;width:min(300px,90%)}
+.dots{display:flex;gap:6px;justify-content:center;margin:10px auto}.dots i{width:9px;height:9px;border-radius:50%;background:var(--red);animation:dp 1s infinite ease-in-out both}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}@keyframes dp{0%,80%,100%{transform:scale(.4);opacity:.4}40%{transform:scale(1);opacity:1}}
+#ld{position:fixed;inset:0;z-index:50;display:none;cursor:progress}#ld.on{display:block}#ld:before{content:"";position:absolute;top:0;left:0;height:3px;width:35%;background:var(--red);border-radius:0 3px 3px 0;animation:bar 1.1s ease-in-out infinite}@keyframes bar{from{left:-35%}to{left:100%}}
+#ld .dots{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);margin:0;padding:15px 20px;background:#fff;border-radius:99px;box-shadow:0 4px 18px #0003}
+#modal.ctr{align-items:center}#modal.lock{cursor:wait}#modal.ctr #mb{border-radius:16px;text-align:center;width:min(300px,90%)}
 </style></head><body>
 <header><img id="logo" hidden alt=""><b id="biz">Bistro POS</b><span class="badge" id="net"></span><span class="badge" id="who"></span><button class="btn gh" id="out" style="padding:4px 10px">Sign out</button></header>
 <nav id="nav"><button data-v="sell" class="on">Sell</button><button data-v="stock" data-r>Stock</button><button data-v="recipes" data-r>Recipes &amp; cost</button><button data-v="shift">Shift &amp; cash-up</button><button data-v="reports" data-r>Reports</button><button data-v="users" data-r>Users</button><button data-v="settings" data-r>Settings</button></nav>
 <main>
 <section id="v-sell" class="on"><div class="sell"><div><div class="grid" id="menu"></div></div>
 <div class="panel"><b id="shiftInfo"></b><div id="cart"></div><div class="row"><span>Total</span><span class="tot" id="total">$0.00</span></div><button class="btn" id="pay" style="width:100%;margin-top:8px">Charge</button><button class="btn gh" id="clear" style="width:100%;margin-top:6px">Clear</button></div></div></section>
-<section id="v-stock"><div class="panel"><b>Add item</b><form id="fItem"><div class="fg"><div><label>Name</label><input name="name" required></div><div><label>Type</label><select name="type"><option value="raw">Raw material (not sold)</option><option value="sales">Sales item</option></select></div>
-<div><label>Unit bought in</label><select name="unit"><option>kg</option><option>g</option><option>l</option><option>ml</option><option>each</option></select></div><div><label>Cost per that unit (USD)</label><input name="cost" type="number" step="any" min="0" value="0"></div>
-<div><label>Selling price (USD)</label><input name="price" type="number" step="any" min="0" value="0"></div><div><label>Prep time (minutes)</label><input name="prep" type="number" min="0" value="10"></div>
-<div><label>Tag</label><select name="tag"><option value="">None</option><option>protein</option><option>starch</option><option>extra</option></select></div><div><label>Opening quantity (in unit above)</label><input name="qty" type="number" step="any" min="0" value="0"></div></div>
+<section id="v-stock"><div class="panel"><b>Add item</b><form id="fItem"><div class="fg"><div><label>Name</label><input name="name" required></div><div><label>What is it?</label><select name="type"><option value="raw">Raw material (not sold)</option><option value="sales">Sales item made from a recipe</option><option value="ready">Sales item bought ready-made</option></select></div>
+<p class="mut" id="tHint" style="grid-column:1/-1;margin:2px 0"></p>
+<div data-s="raw"><label>Unit bought in</label><select name="unit"><option>kg</option><option>g</option><option>l</option><option>ml</option><option>each</option></select></div><div data-s="raw,ready"><label>Cost per unit bought (USD)</label><input name="cost" type="number" step="any" min="0" value="0"></div>
+<div data-s="sales,ready"><label>Selling price (USD)</label><input name="price" type="number" step="any" min="0" value="0"></div><div data-s="sales,ready"><label>Prep time (minutes)</label><input name="prep" type="number" min="0" value="10"></div>
+<div data-s="sales,ready"><label>Tag</label><select name="tag"><option value="">None</option><option>protein</option><option>starch</option><option>extra</option></select></div><div data-s="raw,ready"><label>Opening quantity</label><input name="qty" type="number" step="any" min="0" value="0"></div></div>
 <label>Photo (optional)</label><input type="file" name="photo" accept="image/*"><button class="btn" style="margin-top:10px">Save item</button></form></div>
 <div class="panel"><b>Receive stock</b><form id="fRecv"><div class="fg"><div><label>Item</label><select name="id" id="recvSel"></select></div><div><label>Quantity (negative number corrects stock)</label><input name="q" type="number" step="any" required></div></div><button class="btn alt" style="margin-top:8px">Add to stock</button></form></div>
 <div class="panel"><b>Stock on hand</b><div id="stockList"></div></div></section>
@@ -46,7 +50,7 @@ footer{text-align:center;padding:12px;font-size:12px;color:var(--mut)}
 <section id="v-reports"><div class="tabs" id="rt"><button data-t="ov">Overview</button><button data-t="stk">Stock levels</button><button data-t="cash">Cash</button><button data-t="log">Sales</button></div><select id="rg" style="width:auto;margin-bottom:10px"><option value="1">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="0">All time</option></select><div id="rb"></div></section>
 <section id="v-users"><div class="panel"><b>Add user</b><form id="fUser"><div class="fg"><div><label>Name</label><input name="n" required></div><div><label>Role</label><select name="role"><option value="cashier">Cashier (sell and cash up only)</option><option value="admin">Admin (everything)</option></select></div><div><label>Username</label><input name="un" required autocapitalize="none"></div><div><label>Password</label><input name="p" type="password" minlength="4" required></div></div><button class="btn" style="margin-top:10px">Create user</button></form></div><div class="panel" id="ul"></div></section>
 </main><footer>Bistro powered by Electrify Technologies</footer>
-<div id="modal"><div id="mb"></div></div><div id="toast"></div>
+<div id="ld"><div class="dots"><i></i><i></i><i></i></div></div><div id="modal"><div id="mb"></div></div><div id="toast"></div>
 <div id="login"></div><input type="file" id="phIn" accept="image/*" hidden>
 <script>
 'use strict';
@@ -71,17 +75,17 @@ const write=(ops,batchId)=>new Promise((ok,no)=>{try{const ts=Date.now(),ob=[],t
 /* commit = atomic local write, retried FOR AS LONG AS IT TAKES. Tells you when it fails and keeps trying by itself. */
 async function commit(ops){const bid=uid();
  for(let i=1;;i++){try{const id=await write(ops,bid);if(i>2)closeM();return id}
-  catch(e){console.warn('write failed',e);if(i>=2){const stop=await new Promise(r=>{modal('<h3>Failed to save</h3><p>'+esc(e.message||e)+'</p><div class="spin"></div><p>Trying again automatically...</p><button class="btn gh" id="stp" style="width:100%">Stop trying (nothing is saved)</button>',true,true);$('#stp').onclick=()=>r(true);sleep(Math.min(1000*i,5000)).then(()=>r(false))});if(stop){closeM();throw new Error('Not saved: '+(e.message||e))}}else await sleep(300)}}}
+  catch(e){console.warn('write failed',e);if(i>=2){const stop=await new Promise(r=>{modal('<h3>Failed to save</h3><p>'+esc(e.message||e)+'</p><div class="dots"><i></i><i></i><i></i></div><p>Trying again automatically...</p><button class="btn gh" id="stp" style="width:100%">Stop trying (nothing is saved)</button>',true,true);$('#stp').onclick=()=>r(true);sleep(Math.min(1000*i,5000)).then(()=>r(false))});if(stop){closeM();throw new Error('Not saved: '+(e.message||e))}}else await sleep(300)}}}
 /* save = atomic local write FIRST (works with no network), then instant cloud sync behind a loading pop-up */
 async function save(ops){const id=await commit(ops);if(id)await cloud(id);return id}
 /* The loading pop-up shows only while this click is talking to the cloud. It never traps you: after 12 s it hands over to the
    background retry (the batch stays in the outbox and is re-sent until the cloud acknowledges it). */
 async function cloud(id){if(!CLOUD)return;if(!navigator.onLine){devNote=Date.now();return toast('Saved on this device. It will sync when you are online.')}
- modal('<div class="spin"></div><p>Syncing with the cloud...</p>',true,true);let done=false;
+ loader(true);let done=false;
  const isDone=()=>new Promise(r=>{const q=db.transaction('outbox').objectStore('outbox').get(id);q.onsuccess=()=>r(!q.result||q.result.status==='synced');q.onerror=()=>r(false)});
  const work=(async()=>{for(let i=0;i<3&&!done;i++){await sync(false);done=await isDone();if(!done)await sleep(700*(i+1))}})();
- await Promise.race([work,sleep(12000)]);closeM();if(!done){devNote=Date.now();toast('Saved on this device. The cloud will keep retrying.')}}
-let devNote=0;const toast=m=>{const t=$('#toast');if(Date.now()-devNote<2500&&!/device/i.test(m))m+=' | saved on this device, will sync when the cloud is reachable';t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',3200)};
+ await Promise.race([work,sleep(12000)]);loader(false);if(!done){devNote=Date.now();toast('Saved on this device. The cloud will keep retrying.')}}
+let ldN=0;const loader=on=>{ldN=Math.max(0,ldN+(on?1:-1));$('#ld').classList.toggle('on',ldN>0)};let devNote=0;const toast=m=>{const t=$('#toast');if(Date.now()-devNote<2500&&!/device/i.test(m))m+=' | saved on this device, will sync when the cloud is reachable';t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',3200)};
 const modal=(h,c,lock)=>{$('#mb').innerHTML=h;$('#modal').classList.toggle('ctr',!!c);$('#modal').classList.toggle('lock',!!lock);$('#modal').classList.add('on')},closeM=()=>$('#modal').classList.remove('on');
 $('#modal').onclick=e=>{if(e.target.id==='modal'&&!$('#modal').classList.contains('lock'))closeM()};
 document.addEventListener('submit',e=>{const f=e.target;if(f.dataset.t&&Date.now()-f.dataset.t<600){e.stopImmediatePropagation();e.preventDefault();return}f.dataset.t=Date.now()},true);
@@ -91,7 +95,10 @@ function lazy(el,list,render,n=5){el.innerHTML='';if(!list.length){el.innerHTML=
 async function load(){[items,moves,sales,users]=await Promise.all([all('items'),all('moves'),all('sales'),all('users')]);const sh=await all('shifts');shift=sh.find(s=>s.status==='open')||null;
  stock={};moves.forEach(m=>stock[m.item]=(stock[m.item]||0)+m.qty);const m=await all('meta');const st=m.find(x=>x.k==='settings');if(st)S={...S,...st.v};}
 const by=id=>items.find(i=>i.id===id),unitOf=i=>i.base==='each'?'':i.base,costOf=i=>i.recipe&&i.recipe.length?i.recipe.reduce((a,r)=>a+r.qty*(by(r.id)?.cost||0),0):(i.cost||0);
-const avail=i=>i.recipe&&i.recipe.length?Math.min(...i.recipe.map(r=>Math.floor((stock[r.id]||0)/r.qty))):(stock[i.id]||0);
+const hasRec=i=>!!(i.recipe&&i.recipe.length);
+/* A recipe item has NO stock of its own: how many can be made is the scarcest ingredient. No patties = no burgers. */
+const avail=i=>{if(hasRec(i)){const n=Math.min(...i.recipe.map(r=>r.qty>0?Math.floor(((stock[r.id]||0)+1e-9)/r.qty):Infinity));return isFinite(n)?Math.max(0,n):0}return Math.max(0,Math.floor((stock[i.id]||0)+1e-9))};
+const fits=id=>{const need={};cart.concat([{id,qty:1}]).forEach(l=>{const a=by(l.id);if(!a)return;(hasRec(a)?a.recipe.map(r=>({id:r.id,qty:r.qty*l.qty})):[{id:a.id,qty:l.qty}]).forEach(p=>need[p.id]=(need[p.id]||0)+p.qty)});return Object.keys(need).every(k=>(stock[k]||0)+1e-9>=need[k])};
 const lineParts=l=>{const out=[],add=(it,q)=>{if(!it)return;it.recipe&&it.recipe.length?it.recipe.forEach(r=>out.push({id:r.id,qty:r.qty*q})):out.push({id:it.id,qty:q})};add(by(l.id),l.qty);add(by(l.starch),l.qty);(l.extras||[]).forEach(e=>add(by(e),l.qty));return out};
 const linePrice=l=>((by(l.id)?.price||0)+(l.extras||[]).reduce((a,e)=>a+(by(e)?.price||0),0))*l.qty;
 const totals=()=>{const sub=cart.reduce((a,l)=>a+linePrice(l),0),vat=+S.vat?sub*S.vatp/100:0;return{sub,vat,total:sub+vat}};
@@ -102,17 +109,17 @@ $('#nav').onclick=e=>{if(e.target.dataset.v)show(e.target.dataset.v)};
 const cur=()=>document.querySelector('section.on').id.slice(2);
 function head(){$('#biz').textContent=S.biz;document.title=S.biz+' POS';const l=$('#logo');l.hidden=!S.logo;if(S.logo)l.src=S.logo}
 function rSell(){const sales_=items.filter(i=>i.type==='sales'&&i.active!==false);
- $('#menu').innerHTML=sales_.map(i=>{const a=avail(i);return`<button class="tile" data-id="${i.id}" ${a<=0?'disabled':''}>${i.img?`<img src="${i.img}" alt="">`:''}<b>${esc(i.name)}</b><span>${usd(i.price)} ${a<=0?'<span class="so">Sold out</span>':''}</span><small>${i.tag||''} ${i.prep||0} min</small></button>`}).join('')||'<p class="mut">Add sales items in Stock.</p>';
+ $('#menu').innerHTML=sales_.map(i=>{const a=avail(i);return`<button class="tile" data-id="${i.id}" ${a<=0?'disabled':''}>${i.img?`<img src="${i.img}" alt="">`:''}<b>${esc(i.name)}</b><span>${usd(i.price)} ${a<=0?'<span class="so">Sold out</span>':''}</span><small>${a>0?a+' available | ':''}${i.tag||''} ${i.prep||0} min</small></button>`}).join('')||'<p class="mut">Add sales items in Stock.</p>';
  $('#shiftInfo').textContent=shift?`Shift open: next order #${shift.seq+1}`:'No shift open. Open one in Shift & cash-up.';
  $('#cart').innerHTML=cart.map((l,i)=>`<div class="row"><span>${l.qty} x ${esc(by(l.id)?.name)}${l.starch?'<br><small class="mut">+ '+esc(by(l.starch)?.name)+'</small>':''}${(l.extras||[]).map(e=>'<br><small class="mut">+ '+esc(by(e)?.name)+'</small>').join('')}</span><span>${usd(linePrice(l))} <button class="btn gh" data-rm="${i}">x</button></span></div>`).join('')||'<p class="mut">Cart is empty.</p>';
  $('#total').textContent=usd(totals().total)}
 $('#menu').onclick=e=>{const b=e.target.closest('.tile');if(!b)return;const it=by(b.dataset.id);
- if(it.tag!=='protein'){cart.push({id:it.id,qty:1});return rSell()}
+ if(!fits(it.id))return toast('Not enough stock for another '+it.name);if(it.tag!=='protein'){cart.push({id:it.id,qty:1});return rSell()}
  const st=items.filter(i=>i.tag==='starch'&&i.active!==false),ex=items.filter(i=>i.tag==='extra'&&i.active!==false);
  modal(`<h3>${esc(it.name)}</h3><b>Choose one free starch</b>${st.map((s,i)=>`<label style="display:flex;gap:8px;font-size:15px;color:inherit"><input type="radio" name="st" value="${s.id}" style="width:auto" ${i?'':'checked'}>${esc(s.name)}</label>`).join('')||'<p class="mut">No starch items yet.</p>'}
  <b>Extras (optional)</b>${ex.map(s=>`<label style="display:flex;gap:8px;font-size:15px;color:inherit"><input type="checkbox" name="ex" value="${s.id}" style="width:auto">${esc(s.name)} (+${usd(s.price)})</label>`).join('')||'<p class="mut">No extras yet.</p>'}
  <button class="btn" id="addP" style="width:100%;margin-top:12px">Add to cart</button>`);
- $('#addP').onclick=()=>{const s=document.querySelector('input[name=st]:checked');cart.push({id:it.id,qty:1,starch:s?s.value:'',extras:[...document.querySelectorAll('input[name=ex]:checked')].map(x=>x.value)});closeM();rSell()}};
+ $('#addP').onclick=()=>{if(!fits(it.id)){closeM();return toast('Not enough stock for another '+it.name)}const s=document.querySelector('input[name=st]:checked');cart.push({id:it.id,qty:1,starch:s?s.value:'',extras:[...document.querySelectorAll('input[name=ex]:checked')].map(x=>x.value)});closeM();rSell()}};
 $('#cart').onclick=e=>{if(e.target.dataset.rm){cart.splice(+e.target.dataset.rm,1);rSell()}};
 $('#clear').onclick=()=>{cart=[];rSell()};
 $('#pay').onclick=()=>{if(!shift)return toast('Open a shift first.');if(!cart.length)return toast('Cart is empty.');const t=totals();
@@ -137,13 +144,16 @@ async function printAll(s){const d=new Date(s.at).toLocaleString(),L=s.lines;
 
 const shrink=(f,m=320)=>!f?Promise.resolve(''):new Promise(r=>{const x=new FileReader();x.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,m/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.7))};i.src=x.result};x.readAsDataURL(f)});
 /* ---------- stock ---------- */
-$('#fItem').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),id=uid(),[base,k]=UNITS[f.unit];const raw=f.type==='raw';
- const it={id,name:f.name.trim(),type:f.type,unit:f.unit,base,f:k,cost:raw?+f.cost/k:+f.cost,price:raw?0:+f.price,prep:+f.prep,tag:raw?'':f.tag,recipe:[],active:true,img:await shrink(e.target.elements.photo.files[0])};const ops=[['items',it]];
- if(+f.qty>0)ops.push(['moves',{id:uid(),item:id,qty:+f.qty*k,reason:'opening',at:Date.now()}]);await save(ops);e.target.reset();await load();rStock();toast('Item saved')};
+const HINT={raw:'Ingredients you buy and count, like rolls or patties. Not sold on their own.',sales:'Made from a recipe (set it in Recipes). Its stock is worked out from the raw materials, so there is no quantity to type.',ready:'Bought ready to sell, like a bottled drink. You count its stock yourself.'};
+function fType(){const f=$('#fItem'),t=f.elements.type.value;f.querySelectorAll('[data-s]').forEach(d=>d.hidden=!d.dataset.s.split(',').includes(t));$('#tHint').textContent=HINT[t]}
+$('#fItem').elements.type.onchange=fType;fType();
+$('#fItem').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),id=uid(),raw=f.type==='raw',ready=f.type==='ready',unit=raw?f.unit:'each',[base,k]=UNITS[unit];
+ const it={id,name:f.name.trim(),type:raw?'raw':'sales',unit,base,f:k,cost:raw?+f.cost/k:ready?+f.cost||0:0,price:raw?0:+f.price||0,prep:raw?0:+f.prep||0,tag:raw?'':f.tag,recipe:[],active:true,img:await shrink(e.target.elements.photo.files[0])};const ops=[['items',it]];
+ if((raw||ready)&&+f.qty>0)ops.push(['moves',{id:uid(),item:id,qty:+f.qty*k,reason:'opening',at:Date.now()}]);await save(ops);e.target.reset();fType();await load();rStock();toast('Item saved')};
 $('#fRecv').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),it=by(f.id);if(!it)return;
  await save([['moves',{id:uid(),item:it.id,qty:+f.q*(it.f||1),reason:+f.q<0?'adjust':'receive',at:Date.now()}]]);e.target.reset();await load();rStock();toast('Stock added')};
-function rStock(){$('#recvSel').innerHTML=items.map(i=>`<option value="${i.id}">${esc(i.name)} (${i.unit||'each'})</option>`).join('');
- lazy($('#stockList'),items,i=>`<div class="row"><span><b>${esc(i.name)}</b><br><small class="mut">${i.type==='raw'?'Raw material':'Sales item'} ${i.tag||''}</small></span><span>${(stock[i.id]||0).toFixed(i.base==='each'?0:1)} ${i.base||''}<br><small class="mut">cost ${usd(costOf(i))}</small><br><button class="btn alt" data-ed="${i.id}" style="padding:6px 12px;font-size:13px">Edit</button> <button class="btn gh" data-ph="${i.id}" style="padding:4px 8px;font-size:12px">${i.img?'Change':'Add'} photo</button></span></div>`)}
+function rStock(){$('#recvSel').innerHTML=items.filter(i=>!hasRec(i)).map(i=>`<option value="${i.id}">${esc(i.name)} (${i.unit||'each'})</option>`).join('');
+ lazy($('#stockList'),items,i=>`<div class="row"><span><b>${esc(i.name)}</b><br><small class="mut">${i.type==='raw'?'Raw material':'Sales item'} ${i.tag||''}</small></span><span>${hasRec(i)?'<b>'+avail(i)+'</b> can be made<br><small class="mut">from recipe stock</small>':(stock[i.id]||0).toFixed(i.base==='each'?0:1)+' '+(i.base||'')}<br><small class="mut">cost ${usd(costOf(i))}</small><br><button class="btn alt" data-ed="${i.id}" style="padding:6px 12px;font-size:13px">Edit</button> <button class="btn gh" data-ph="${i.id}" style="padding:4px 8px;font-size:12px">${i.img?'Change':'Add'} photo</button></span></div>`)}
 $('#stockList').onclick=e=>{const d=e.target.closest('[data-ed]');if(d)return editItem(d.dataset.ed);const b=e.target.closest('[data-ph]');if(!b)return;const f=$('#phIn');f.onchange=async()=>{const img=await shrink(f.files[0]);if(img){await save([['items',{...by(b.dataset.ph),img}]]);await load();rStock()}f.value=''};f.click()};
 
 /* ---------- recipes and cost ---------- */
@@ -195,7 +205,7 @@ async function doPull(){const mt=await all('meta'),lp=(mt.find(x=>x.k==='lastPul
  const mi=new Set(moves.map(m=>m.id)),si=new Set(sales.map(s=>s.id));(r.moves||[]).forEach(m=>{if(!mi.has(m.id))ops.push(['moves',m,false])});(r.sales||[]).forEach(s=>{if(!si.has(s.id))ops.push(['sales',s,false])});
  if(r.config&&r.config.ts>((ls&&ls.ts)||0)){const v={...S,...r.config.v};v.rate=+v.rate||32;v.vatp=+v.vatp||0;ops.push(['meta',{k:'settings',v,ts:r.config.ts},false])}
  const changed=ops.length;ops.push(['meta',{k:'lastPull',v:(r.now||Date.now())-5000},false]);await write(ops);if(changed){await load();head();if(me&&!$('#modal').classList.contains('on'))show(cur())}}
-addEventListener('online',()=>{pending();sync(true)});addEventListener('offline',pending);setInterval(()=>{if(!inflight)sync(true)},15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!inflight)sync(true)});
+addEventListener('online',()=>{pending();refreshUsers().then(()=>sync(true))});addEventListener('offline',pending);setInterval(()=>{if(!inflight)refreshUsers().then(()=>sync(true))},15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!inflight)sync(true)});
 
 /* ---------- install pop-up ---------- */
 let ip=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;ask()});
@@ -203,8 +213,19 @@ function ask(){if(matchMedia('(display-mode:standalone)').matches||localStorage.
  modal(`<h3>Install Bistro POS</h3><p>Open it like an app and keep selling when the network drops.</p>${ios&&!ip?'<p>On iPhone: tap Share, then Add to Home Screen.</p>':''}${ip?'<button class="btn" id="inst" style="width:100%">Install</button>':''}<button class="btn gh" id="no" style="width:100%;margin-top:8px">Not now</button>`);
  if($('#inst'))$('#inst').onclick=async()=>{closeM();ip.prompt();await ip.userChoice;ip=null};$('#no').onclick=()=>{localStorage.noInst=1;closeM()}}
 
+/* Pull every user from the cloud into IndexedDB (small and fast, separate from the big data pull), so sign-in works offline. */
+async function refreshUsers(){if(!CLOUD||!navigator.onLine)return false;
+ try{const r=await post({action:'users'});await load();const ops=[];(r.users||[]).forEach(x=>{const l=users.find(y=>y.id===x.id);if(!l||x.ts>l.ts)ops.push(['users',x,false])});if(ops.length){await write(ops);await load()}return true}catch(e){console.warn('users',e);return false}}
 /* ---------- accounts: default admin is seeded silently; every credential is editable and synced ---------- */
-const sha=async t=>{if(crypto.subtle)return[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,'0')).join('');throw new Error('Open this app over https so passwords can be checked.')};
+/* SHA-256: the browser's own when available, otherwise this small exact copy (so sign-in never depends on https). */
+const sha256js=m=>{const u=new TextEncoder().encode(m),l=u.length,n=((l+9+63)>>6)<<4,w=new Uint32Array(n),K=[],H=[],r=(x,k)=>x>>>k|x<<32-k;let i,o;
+ for(let c=2,p=0;p<64;c++){let q=1;for(let j=2;j*j<=c;j++)if(c%j===0)q=0;if(q){K[p]=Math.cbrt(c)*4294967296|0;if(p<8)H[p]=Math.sqrt(c)*4294967296|0;p++}}
+ for(i=0;i<l;i++)w[i>>2]|=u[i]<<24-8*(i&3);w[l>>2]|=128<<24-8*(l&3);w[n-1]=l*8;
+ for(o=0;o<n;o+=16){const x=new Uint32Array(64);for(i=0;i<16;i++)x[i]=w[o+i];for(i=16;i<64;i++)x[i]=x[i-16]+(r(x[i-15],7)^r(x[i-15],18)^x[i-15]>>>3)+x[i-7]+(r(x[i-2],17)^r(x[i-2],19)^x[i-2]>>>10)|0;
+  let a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+  for(i=0;i<64;i++){const t1=h+(r(e,6)^r(e,11)^r(e,25))+(e&f^~e&g)+K[i]+x[i]|0,t2=(r(a,2)^r(a,13)^r(a,22))+(a&b^a&c^b&c)|0;h=g;g=f;f=e;e=d+t1|0;d=c;c=b;b=a;a=t1+t2|0}
+  [a,b,c,d,e,f,g,h].forEach((v,j)=>H[j]=H[j]+v|0)}return H.map(v=>(v>>>0).toString(16).padStart(8,'0')).join('')};
+const sha=async t=>{try{if(window.crypto&&crypto.subtle)return[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){}return sha256js(t)};
 async function saveUser(u,pw){const id=u.id||uid(),rec={role:'cashier',active:true,...u,id};rec.username=String(rec.username).trim().toLowerCase();if(pw)rec.h=await sha(id+pw);
  if(users.some(x=>x.username===rec.username&&x.id!==id))throw new Error('That username is already taken.');await save([['users',rec]])}
 function enter(){$('#login').style.display='none';document.querySelectorAll('[data-r]').forEach(b=>b.hidden=me.role!=='admin');$('#who').textContent=me.name+' ('+me.role+')';show('sell')}
@@ -213,7 +234,7 @@ function loginUI(){const L=$('#login');L.style.display='flex';
  L.innerHTML=`<form id="lf" class="panel"><h3>${esc(S.biz)} sign in</h3><label>Username</label><input name="u" autocomplete="username" autocapitalize="none" required><label>Password</label><input name="p" type="password" autocomplete="current-password" required><p id="le" style="color:#b8321a"></p><button class="btn" style="width:100%">Sign in</button></form>`;
  let fails=0;$('#lf').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),un=f.u.trim().toLowerCase();if(fails>=5)return $('#le').textContent='Too many tries. Reload the page.';
   const find=()=>users.find(x=>x.username===un&&x.active!==false),ok=async u=>!!u&&await sha(u.id+f.p)===u.h;let u=find();
-  if(!await ok(u)&&navigator.onLine&&CLOUD){modal('<div class="spin"></div><p>Checking with the cloud...</p>',true,true);await sync(true);closeM();await load();u=find()}
+  if(!await ok(u)&&navigator.onLine&&CLOUD){loader(true);try{await refreshUsers()}finally{loader(false)}u=find()}
   if(await ok(u)){me=u;sessionStorage.me=u.id;enter()}else{fails++;$('#le').textContent='Wrong username or password'}}}
 function rUsers(){lazy($('#ul'),users,u=>`<div class="row"><span><b>${esc(u.name)}</b><br><small class="mut">${esc(u.username)} | ${u.role}${u.active===false?' (disabled)':''}</small></span><button class="btn gh" data-eu="${u.id}">Edit</button></div>`)}
 $('#fUser').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));try{await saveUser({name:f.n,username:f.un,role:f.role},f.p)}catch(x){return toast(x.message)}e.target.reset();await load();rUsers();toast('User created')};
@@ -224,14 +245,14 @@ function editUser(id){const u=users.find(x=>x.id===id),self=me&&u.id===me.id;
 /* ---------- edit a product ---------- */
 function editItem(id){const i=by(id);if(!i)return;const raw=i.type==='raw',u=i.unit||'each',cur=(stock[i.id]||0)/(i.f||1);
  modal(`<h3>Edit ${esc(i.name)}</h3><p class="mut" style="margin:0">${raw?'Raw material':'Sales item'} | bought in ${esc(u)}</p><form id="fe"><label>Name</label><input name="n" value="${esc(i.name)}" required>
- <label>Cost per ${esc(u)} (USD)</label><input name="c" type="number" step="any" min="0" value="${raw?+(i.cost*i.f).toFixed(6):i.cost}">
+ ${hasRec(i)?'':`<label>Cost per ${esc(u)} (USD)</label><input name="c" type="number" step="any" min="0" value="${raw?+(i.cost*i.f).toFixed(6):i.cost}">`}
  ${raw?'':`<label>Selling price (USD)</label><input name="p" type="number" step="any" min="0" value="${i.price}"><label>Prep time (minutes)</label><input name="m" type="number" min="0" value="${i.prep||0}"><label>Tag</label><select name="t">${['','protein','starch','extra'].map(t=>`<option value="${t}" ${t===(i.tag||'')?'selected':''}>${t||'None'}</option>`).join('')}</select>`}
- ${raw||!(i.recipe&&i.recipe.length)?`<label>Stock count now, in ${esc(u)} (currently ${+cur.toFixed(3)}; leave blank to keep)</label><input name="sc" type="number" step="any">`:'<p class="mut">Stock of this item follows its recipe ingredients.</p>'}
+ ${!hasRec(i)?`<label>Stock count now, in ${esc(u)} (currently ${+cur.toFixed(3)}; leave blank to keep)</label><input name="sc" type="number" step="any">`:`<p class="mut">${avail(i)} can be made right now. This item has no stock of its own: it follows its recipe ingredients.</p>`}
  <label>Status</label><select name="a"><option value="1">Active</option><option value="0" ${i.active===false?'selected':''}>Hidden (not sold)</option></select>
  <label>New photo (optional)</label><input type="file" name="photo" accept="image/*"><button class="btn" style="width:100%;margin-top:10px">Save changes</button></form>`);
  $('#fe').onsubmit=async e=>{e.preventDefault();const btn=e.submitter||e.target.querySelector('button');if(btn.disabled)return;btn.disabled=true;
   try{const f=Object.fromEntries(new FormData(e.target)),img=await shrink(e.target.elements.photo.files[0]);
-   const ops=[['items',{...i,name:f.n.trim(),cost:raw?+f.c/i.f:+f.c,price:raw?0:+f.p,prep:raw?i.prep:+f.m,tag:raw?'':f.t,active:f.a==='1',img:img||i.img||''}]];
+   const ops=[['items',{...i,name:f.n.trim(),cost:f.c===undefined?i.cost:raw?+f.c/i.f:+f.c,price:raw?0:+f.p,prep:raw?i.prep:+f.m,tag:raw?'':f.t,active:f.a==='1',img:img||i.img||''}]];
    if(f.sc!==undefined&&f.sc!==''&&isFinite(+f.sc)){const d=+f.sc*(i.f||1)-(stock[i.id]||0);if(Math.abs(d)>1e-9)ops.push(['moves',{id:uid(),item:i.id,qty:d,reason:'adjust',at:Date.now()}])}
    await save(ops);closeM();await load();rStock();toast('Product updated')}
   catch(x){btn.disabled=false;toast(x.message)}}}
@@ -243,7 +264,7 @@ async function loadRep(t){const b=$('#rb');b.innerHTML='<div class="sk"></div><d
   ss.forEach(s=>{const k=new Date(s.at).toISOString().slice(5,10);d[k]=d[k]||{r:0,p:0};d[k].r+=s.sub;d[k].p+=s.sub-s.cost});const ks=Object.keys(d).sort().slice(-14),mx=Math.max(1,...ks.map(k=>d[k].r));
   const bars=ks.map((k,i)=>{const x=14+i*44,hr=d[k].r/mx*110,hp=Math.max(0,d[k].p)/mx*110;return`<rect x="${x}" y="${120-hr}" width="16" height="${hr}" fill="#1d2321"/><rect x="${x+18}" y="${120-hp}" width="16" height="${hp}" fill="#2f6b4f"/><text x="${x}" y="136" font-size="9">${k}</text>`}).join('');
   b.innerHTML=`<div class="kpi"><div>Revenue<b>${usd(rev)}</b></div><div>Cost<b>${usd(cost)}</b></div><div>Profit<b>${usd(rev-cost)}</b></div><div>Margin<b>${rev?((rev-cost)/rev*100).toFixed(0):0}%</b></div><div>Orders<b>${ss.length}</b></div><div>VAT collected<b>${usd(vat)}</b></div></div><div class="panel"><b>Revenue vs profit</b> <small class="mut">dark: revenue, green: profit</small>${ks.length?`<svg viewBox="0 0 ${ks.length*44+20} 144" style="width:100%;max-height:220px">${bars}</svg>`:'<p class="mut">No sales in this period.</p>'}</div>`}
- else if(t==='stk'){const v=items.reduce((a,i)=>a+Math.max(0,stock[i.id]||0)*(i.cost||0),0);b.innerHTML=`<div class="kpi"><div>Stock value<b>${usd(v)}</b></div></div><div class="panel" id="rl"></div>`;lazy($('#rl'),items.slice().sort((a,c)=>(stock[a.id]||0)-(stock[c.id]||0)),i=>`<div class="row"><span>${esc(i.name)}<br><small class="mut">${i.type==='raw'?'Raw':'Sales'}</small></span><span><b style="color:${(stock[i.id]||0)<=0?'#b8321a':'inherit'}">${(stock[i.id]||0).toFixed(i.base==='each'?0:1)} ${i.base||''}</b><br><small class="mut">${usd((stock[i.id]||0)*(i.cost||0))}</small></span></div>`)}
+ else if(t==='stk'){const v=items.reduce((a,i)=>a+(hasRec(i)?0:Math.max(0,stock[i.id]||0)*(i.cost||0)),0);b.innerHTML=`<div class="kpi"><div>Stock value<b>${usd(v)}</b></div></div><div class="panel" id="rl"></div>`;lazy($('#rl'),items.slice().sort((a,c)=>(hasRec(a)?avail(a):stock[a.id]||0)-(hasRec(c)?avail(c):stock[c.id]||0)),i=>{const q=hasRec(i)?avail(i):(stock[i.id]||0);return`<div class="row"><span>${esc(i.name)}<br><small class="mut">${i.type==='raw'?'Raw':hasRec(i)?'Recipe item':'Sales'}</small></span><span><b style="color:${q<=0?'#b8321a':'inherit'}">${hasRec(i)?q+' can be made':q.toFixed(i.base==='each'?0:1)+' '+(i.base||'')}</b><br><small class="mut">${hasRec(i)?'':usd(q*(i.cost||0))}</small></span></div>`})}
  else if(t==='cash'){const m={};ss.forEach(s=>m[s.method]=(m[s.method]||0)+s.total);const sh=(await all('shifts')).filter(x=>x.cashup&&inR({at:x.at})).sort((a,c)=>c.at-a.at);
   b.innerHTML=`<div class="kpi">${Object.entries(METHODS).map(([k,v])=>`<div>${v}<b>${usd(m[k]||0)}</b></div>`).join('')}</div><div class="panel"><b>Closed shifts</b><div id="rl"></div></div>`;
   lazy($('#rl'),sh,x=>{const e=Object.values(x.cashup.exp).reduce((a,c)=>a+c,0),g=Object.values(x.cashup.got).reduce((a,c)=>a+c,0);return`<div class="row"><span>${esc(x.by||'')}<br><small class="mut">${new Date(x.at).toLocaleString()}</small></span><span>Expected ${usd(e)}<br>${g>=e?'Over':'Short'} ${usd(Math.abs(g-e))}</span></div>`})}
@@ -253,10 +274,12 @@ async function loadRep(t){const b=$('#rb');b.innerHTML='<div class="sk"></div><d
  try{db=await open()}catch(e){document.body.innerHTML='<p style="padding:20px">This browser cannot store data on this device ('+esc(e.message)+'). Close private/incognito mode and reload.</p>';return}
  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
  await load();head();pending();
- if(CLOUD&&navigator.onLine){modal('<div class="spin"></div><p>Loading from cloud...</p>',true,true);await Promise.race([sync(true),sleep(15000)]);closeM();await load();head()}
- /* First ever start: the default admin account is seeded silently (local only, ts 0, so any cloud edit always wins). */
+ /* Every open: refresh the user list from the cloud into IndexedDB. First ever open (nothing local yet) waits for it behind the loader. */
+ if(!users.length&&CLOUD&&navigator.onLine){loader(true);try{await Promise.race([refreshUsers(),sleep(15000)])}finally{loader(false)}await load()}
+ /* Truly first start with no network at all: the built-in first login (same one setup creates in the cloud) lets you in. */
  if(!users.length){await commit([['users',DEFAULT_ADMIN,false]]);await load()}
  const sid=sessionStorage.me;me=users.find(u=>u.id===sid&&u.active!==false)||null;me?enter():loginUI();
+ if(CLOUD&&navigator.onLine){refreshUsers().then(()=>sync(true)).then(async()=>{await load();head();if(me&&!$('#modal').classList.contains('on'))show(cur())})}
  if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(()=>{});setTimeout(ask,1500)})();
 
 </script></body></html>
