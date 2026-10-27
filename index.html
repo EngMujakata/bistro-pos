@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#b8321a"><link rel="manifest" href="manifest.json"><title>spark POS</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#b8321a"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="logo.png"><title>spark POS</title>
 <style>
 :root{--ink:#1d2321;--bg:#f1f2ef;--card:#fff;--line:#d9dcd6;--red:#b8321a;--grn:#2f6b4f;--mut:#6a726d;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
@@ -32,29 +32,44 @@ footer{text-align:center;padding:12px;font-size:12px;color:var(--mut)}
 #sp{position:fixed;right:14px;bottom:14px;width:min(330px,92%);background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 6px 24px #0003;z-index:40;display:none}#sp .bar{height:8px;background:#e6e8e3;border-radius:99px;overflow:hidden;margin-top:8px}#sp .bar i{display:block;height:100%;background:var(--red);width:0;transition:width .2s}
 .ic{width:18px;height:18px;vertical-align:middle}.rsel{display:flex;gap:8px;align-items:flex-start}.rsel .btn{padding:10px 16px;font-size:18px;line-height:1}.qi{width:90px!important;padding:6px!important}
 .hd{display:flex;justify-content:space-between;align-items:center;gap:8px}[hidden]{display:none!important}
+
+@media(max-width:600px){
+ body{font-size:14px}header{padding:8px 10px;gap:7px}header b{font-size:16px}
+ main{padding:8px}nav{padding:6px;gap:3px;position:sticky;top:0;z-index:8}
+ nav button{padding:10px 12px;font-size:13px;min-height:42px}
+ .panel{padding:10px;border-radius:10px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .tile{padding:9px;min-height:80px}.fg{grid-template-columns:1fr;gap:0}
+ input,select{min-height:44px;font-size:16px}.btn{min-height:44px;padding:11px 12px}
+ .tot{font-size:20px}.tb{font-size:12px}.tb th,.tb td{padding:7px 3px}
+ #sp{right:8px;bottom:8px;width:calc(100% - 16px)}#mb{padding:12px}
+ .sell{grid-template-columns:minmax(0,1fr)}#menu{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style></head><body>
 <header><img id="logo" hidden alt=""><b id="biz">spark POS</b><button class="badge" id="net" hidden></button><button class="badge off" id="rj" hidden></button><button class="badge off" id="neg" hidden></button><span class="badge" id="who"></span><button class="btn gh" id="out" style="padding:4px 10px">Sign out</button></header>
 <nav id="nav"><button data-v="sell" class="on">Sell</button><button data-v="stock" data-r>Stock</button><button data-v="recipes" data-r>Recipes &amp; cost</button><button data-v="shift">Shift &amp; cash-up</button><button data-v="reports" data-r>Reports</button><button data-v="users" data-r>Users</button><button data-v="settings" data-r>Settings</button></nav>
 <main>
-<section id="v-sell" class="on"><div class="sell"><div><div class="grid" id="menu"></div></div>
+<section id="v-sell" class="on"><div id="netBanner" class="panel" style="border-color:#e0a100;background:#fff8e1" hidden></div><div class="sell"><div><div class="grid" id="menu"></div></div>
 <div class="panel"><b id="shiftInfo"></b><div id="cart"></div><div class="row"><span>Total</span><span class="tot" id="total">$0.00</span></div><button class="btn" id="pay" style="width:100%;margin-top:8px">Charge</button><button class="btn gh" id="clear" style="width:100%;margin-top:6px">Clear</button></div></div></section>
-<section id="v-stock"><div class="panel"><b>Add item</b><form id="fItem"><div class="fg"><div><label>Name</label><input name="name" required></div><div><label>What is it?</label><select name="type"><option value="raw">Raw material (not sold)</option><option value="sales">Sales item made from a recipe</option><option value="ready">Sales item bought ready-made</option></select></div>
+<section id="v-stock"><div class="panel"><b>Add item</b><form id="fItem"><div class="fg"><div><label>Product name</label><input name="name" required></div><div><label>Product code (permanent)</label><input name="code" maxlength="64" placeholder="Auto-generated if blank"></div><div><label>What is it?</label><select name="type"><option value="raw">Raw material (not sold)</option><option value="sales">Sales item made from a recipe</option><option value="ready">Sales item bought ready-made</option></select></div>
 <p class="mut" id="tHint" style="grid-column:1/-1;margin:2px 0"></p>
 <div data-s="raw"><label>Unit bought in</label><select name="unit"><option>kg</option><option>g</option><option>l</option><option>ml</option><option>each</option></select></div><div data-s="raw,ready"><label>Cost per unit bought (USD)</label><input name="cost" type="number" step="any" min="0" value="0"></div>
 <div data-s="ready"><label>Selling price (USD)</label><input name="price" type="number" step="any" min="0" value="0"></div><div data-s="sales,ready"><label>Prep time (minutes)</label><input name="prep" type="number" min="0" value="10"></div>
 <div data-s="sales,ready"><label>Tag</label><select name="tag"><option value="">None</option><option>protein</option><option>starch</option><option>extra</option></select></div><div data-s="raw,ready"><label>Opening quantity</label><input name="qty" type="number" step="any" min="0" value="0"></div>
 <div data-s="sales,ready" style="grid-column:1/-1"><label>Photo (optional)</label><input type="file" name="photo" accept="image/*"></div></div>
 <button class="btn" style="margin-top:10px">Save item</button></form></div>
-<div class="panel"><b>Receive stock</b><form id="fRecv"><div class="fg"><div><label>Item (type to search)</label><div id="recvHost"></div></div><div><label id="rqL2">Quantity (negative number corrects stock)</label><input name="q" type="number" step="any" required></div></div><button class="btn alt" style="margin-top:8px">Add to stock</button></form></div>
+<div class="panel"><b>Import / export products (CSV)</b><p class="mut">Download the template with sample raw materials and sales items, edit it in Excel, then import. Product IDs/codes remain stable; importing an existing code updates that product.</p><button class="btn gh" id="csvTemplate" type="button">Download CSV template</button><button class="btn alt" id="csvExport" type="button" style="margin-left:6px">Export current products</button><label>Import CSV file</label><input id="csvFile" type="file" accept=".csv,text/csv"><div id="csvStatus" class="mut"></div></div><div class="panel"><b>Receive stock</b><form id="fRecv"><div class="fg"><div><label>Item (type to search)</label><div id="recvHost"></div></div><div><label id="rqL2">Quantity (negative number corrects stock)</label><input name="q" type="number" step="any" required></div></div><button class="btn alt" style="margin-top:8px">Add to stock</button></form></div>
 <div class="panel"><div class="hd"><b>Stock on hand</b><button class="btn gh" id="stkS" title="Search stock" style="padding:6px 10px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></div><input id="stkQ" placeholder="Search stock..." hidden style="margin-top:8px"><div id="stockList"></div></div></section>
 <section id="v-recipes"><div class="panel"><label>Sales item (type to search)</label><div class="rsel"><div id="rSelHost" style="flex:1"></div><button class="btn alt" id="rNew" title="Create a new sales item">+</button></div><div id="rBody"></div></div></section>
 <section id="v-shift"><div class="panel" id="shiftBox"></div></section>
 <section id="v-settings"><div class="panel"><form id="fSet"><div class="fg"><div><label>Business name</label><input name="biz"></div><div><label>1 USD = ZiG</label><input name="rate" type="number" step="any" min="0"></div>
-<div><label>VAT on receipts</label><select name="vat"><option value="0">Off</option><option value="1">On</option></select></div><div><label>VAT %</label><input name="vatp" type="number" step="any"></div>
+<div><label>Tax mode</label><select name="vat"><option value="0">Tax off</option><option value="add">Add tax on top of price</option><option value="included">Tax included in displayed price</option></select></div><div><label>VAT / tax %</label><input name="vatp" type="number" step="any" min="0"></div>
+<div><label>Require stock count at cash-up</label><select name="stocktakeEnabled"><option value="false">Disabled — cash only</option><option value="true">Enabled — cash and stock</option></select></div>
+<div><label>Short/over alarm threshold (USD value)</label><input name="alarmThreshold" type="number" min="0" step="0.01"></div>
 <div><label>Paper size</label><select name="paper"><option>80mm</option><option>58mm</option><option>A4</option></select></div><div><label>Kitchen ticket</label><select name="kit"><option value="auto">Print straight after receipt</option><option value="button">Ask me, so I can pick the kitchen printer</option><option value="off">Do not print</option></select></div><div><label>Kitchen paper</label><select name="kpaper"><option>80mm</option><option>58mm</option><option>A4</option></select></div></div>
 <label>Logo</label><input type="file" id="logoIn" accept="image/*"><button class="btn" style="margin-top:10px">Save settings</button></form></div>
-<div class="panel"><b>This PC</b><form id="fDev"><label>Device name (T1, T2...) - stored on this PC only</label><input name="dn" maxlength="12" autocapitalize="characters"><button class="btn alt" style="margin-top:8px">Save device name</button></form><button class="btn gh" id="bk" style="margin-top:8px">Export data not yet in the cloud (backup file)</button><div id="devList"></div></div></section>
-<section id="v-reports"><div class="tabs" id="rt"><button data-t="ov">Overview</button><button data-t="stk">Stock levels</button><button data-t="updates">Stock updates</button><button data-t="cash">Cash</button><button data-t="log">Sales</button></div><select id="rg" style="width:auto;margin-bottom:10px"><option value="1">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="0">All time</option></select><div id="rb"></div></section>
+<div class="panel"><b>This PC</b><form id="fDev"><label>Device name (e.g. Chicken Till 1) - stored on this PC only</label><input name="dn" maxlength="12" autocapitalize="characters"><button class="btn alt" style="margin-top:8px">Save device name</button></form><button class="btn gh" id="bk" style="margin-top:8px">Export data not yet in the cloud (backup file)</button><div id="devList"></div></div>
+<div class="panel"><b>Printers</b><p class="mut">Choose which installed Windows printer prints the customer receipt and which prints the kitchen ticket. Printing runs silently in the background and never blocks the till.</p><div class="fg"><div><label>POS / receipt printer</label><select id="posPrinter"></select></div><div><label>Kitchen printer</label><select id="kitPrinter"></select></div></div><button class="btn alt" id="savePrinters" style="margin-top:8px">Save printers</button><div id="printerStatus" class="mut" style="margin-top:8px"></div></div></section>
+<section id="v-reports"><div class="tabs" id="rt"><button data-t="ov">Overview</button><button data-t="stk">Stock levels</button><button data-t="updates">Stock updates</button><button data-t="cash">Cash</button><button data-t="profile">Cashier profile</button><button data-t="log">Sales</button></div><select id="rg" style="width:auto;margin-bottom:10px"><option value="1">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="0">All time</option></select><div id="rb"></div></section>
 <section id="v-users"><div class="panel"><b>Add user</b><form id="fUser"><div class="fg"><div><label>Name</label><input name="n" required></div><div><label>Role</label><select name="role"><option value="cashier">Cashier (sell and cash up only)</option><option value="admin">Admin (everything)</option></select></div><div><label>Username</label><input name="un" required autocapitalize="none"></div><div><label>Password (6+ characters)</label><input name="p" type="password" minlength="6" required></div></div><button class="btn" style="margin-top:10px">Create user</button></form></div><div class="panel" id="ul"></div></section>
 </main><footer>spark powered by Electrify Technologies</footer>
 <div id="sp"><b id="spT">Uploading...</b><div class="bar"><i id="spB"></i></div><small class="mut" id="spM"></small></div>
@@ -64,14 +79,19 @@ footer{text-align:center;padding:12px;font-size:12px;color:var(--mut)}
 'use strict';
 /* CLOUD ENDPOINT: the deployed Apps Script /exec URL. The key below is only a light gate: real security is the sign-in token the server issues after a correct username and password. */
 const API_URL='https://script.google.com/macros/s/AKfycbx2aj_p1o0tP3BFAMDoiGz66Wy896zVE4XWqUqlp5VQ6vhwTLtJ0cuL4o851E6OmdQ/exec',API_KEY='132789ea664124be76435c6a3105e6e3c183871113464ef6';
-const CLOUD=/^https?:\/\//.test(API_URL),ROWS=500;
+const CLOUD=/^https?:\/\//.test(API_URL),ROWS=500; // Hard cap: no request may contain more than 500 rows
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 /* spark POS core. Local-first (IndexedDB) with an idempotent outbox. spark powered by Electrify Technologies */
 const $=s=>document.querySelector(s),uid=()=>crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:r&3|8).toString(16)}),usd=n=>'$'+(+n||0).toFixed(2),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const UNITS={kg:['g',1000],g:['g',1],l:['ml',1000],ml:['ml',1],each:['each',1]},METHODS={cash:'Hard cash',swipe:'Card swipe',bank:'Bank transfer',mobile:'Mobile money'};
-let me=null,users=[],PP='80mm',db,items=[],moves=[],sales=[],shifts=[],shift=null,S={biz:'spark',rate:32,vat:0,vatp:15,paper:'80mm',logo:''},stock={},cart=[],busy=false,rec=[];
+let me=null,users=[],PP='80mm',db,items=[],moves=[],sales=[],shifts=[],shift=null,S={biz:'spark',rate:32,vat:0,vatp:15,paper:'80mm',logo:'',posPrinter:'',kitPrinter:''},stock={},cart=[],busy=false,rec=[];
 let DEV=null,AUTH=null,SY={c:{},seq:0},SB=null,pendRows=0,rejList=[],syncing=false,polling=false,lastSynced=false;
-const open=()=>new Promise((ok,no)=>{const r=indexedDB.open('spark2',2);r.onupgradeneeded=()=>{const d=r.result;['items','moves','sales','shifts','outbox','users'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'k'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+/* Network circuit breaker: ONLINE -> TRYING (max 3 fast tries) -> POOR_NETWORK (latched, no auto calls).
+   OFFLINE is navigator.onLine===false. POOR_NETWORK and OFFLINE behave the same for selling/printing;
+   they only differ in the badge label and what un-latches them (Retry button or the OS 'online' event). */
+let NET='ONLINE',tryCount=0;const MAX_TRIES=3,TRY_TIMEOUT=8000;
+function setNet(s){ if(NET===s) return; NET=s; renderNetBadge(); }
+const open=()=>new Promise((ok,no)=>{const r=indexedDB.open('spark2',3);r.onupgradeneeded=()=>{const d=r.result;['items','moves','sales','shifts','outbox','users','printqueue'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'k'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const all=n=>new Promise(r=>{const q=db.transaction(n).objectStore(n).getAll();q.onsuccess=()=>r(q.result)});
 const itemsOf=o=>o.items||[{store:o.store,data:o.data}];
 /* ATOMIC: the data rows and ONE outbox record commit in ONE IndexedDB transaction, or nothing is written.
@@ -130,7 +150,10 @@ const fits=id=>{const need={};cart.concat([{id,qty:1}]).forEach(l=>lineParts(l).
 const cartHasStock=()=>{const need={};cart.forEach(l=>lineParts(l).forEach(p=>need[p.id]=(need[p.id]||0)+p.qty));return Object.keys(need).every(k=>(stock[k]||0)+1e-9>=need[k]&&by(k)?.active!==false)};
 const lineParts=l=>{const out=[],add=(it,q)=>{if(!it)return;it.recipe&&it.recipe.length?it.recipe.forEach(r=>out.push({id:r.id,qty:r.qty*q})):out.push({id:it.id,qty:q})};add(by(l.id),l.qty);add(by(l.starch),l.qty);(l.extras||[]).forEach(e=>add(by(e),l.qty));return out};
 const linePrice=l=>((by(l.id)?.price||0)+(l.extras||[]).reduce((a,e)=>a+(by(e)?.price||0),0))*l.qty;
-const totals=()=>{const sub=cart.reduce((a,l)=>a+linePrice(l),0),vat=+S.vat?sub*S.vatp/100:0;return{sub,vat,total:sub+vat}};
+const totals=()=>{const priceTotal=cart.reduce((a,l)=>a+linePrice(l),0),rate=Math.max(0,+S.vatp||0)/100,mode=String(S.vat||'0');let sub=priceTotal,vat=0,total=priceTotal;
+ if(mode==='add'||mode==='1'){vat=priceTotal*rate;total=priceTotal+vat}
+ else if(mode==='included'){total=priceTotal;vat=rate?priceTotal*rate/(1+rate):0;sub=total-vat}
+ return{sub,vat,total}};
 
 /* ---------- views ---------- */
 function show(v){if(me&&me.role!=='admin'&&!['sell','shift'].includes(v))v='sell';document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));({sell:rSell,stock:rStock,recipes:()=>rRecipes(),shift:rShift,settings:rSet,reports:rReports,users:rUsers})[v]()}
@@ -155,31 +178,83 @@ $('#clear').onclick=()=>{cart=[];rSell()};
 $('#pay').onclick=()=>{if(!DEV)return devModal();if(!shift)return toast('Open a shift first.');if(!cart.length)return toast('Cart is empty.');const t=totals();
  modal(`<h3>Charge ${usd(t.total)}</h3><label>Payment type</label><select id="pm">${Object.entries(METHODS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><label>Currency</label><select id="pc"><option>USD</option><option>ZiG</option></select><p id="pa" class="tot">${usd(t.total)}</p><button class="btn" id="go" style="width:100%">Confirm payment</button>`);
  $('#pc').onchange=()=>$('#pa').textContent=$('#pc').value==='ZiG'?'ZiG '+(t.total*S.rate).toFixed(2):usd(t.total);$('#go').onclick=()=>checkout($('#pm').value,$('#pc').value)};
+
+/* ---------- the sale: commit -> sync (bg) -> print (never blocks the checkout) ---------- */
 async function checkout(method,cur){if(busy)return;busy=true;$('#go').disabled=true;
  try{if(!cartHasStock())throw new Error('Stock changed or is insufficient for this cart. Reload stock before charging.');const t=totals(),no=shift.seq+1,saleId=uid(),at=Date.now();let cost=0;const mv=[];
   cart.forEach(l=>lineParts(l).forEach(p=>{cost+=p.qty*(by(p.id)?.cost||0);mv.push({id:uid(),item:p.id,qty:-p.qty,reason:'sale',ref:saleId,actor:actor(),action:'SALE_STOCK_DEDUCTION',productName:by(p.id)?.name||'',prevQty:stock[p.id]||0,newQty:(stock[p.id]||0)-p.qty,at})}));
   const sale={id:saleId,no,dev:DEV.name,shiftId:shift.id,lines:cart.map(l=>({...l,name:by(l.id)?.name,starchName:by(l.starch)?.name,extraNames:(l.extras||[]).map(e=>by(e)?.name),price:linePrice(l)})),sub:t.sub,vat:t.vat,total:t.total,method,cur,rate:S.rate,cost,at,by:me?me.name:''};
-  const sh={...shift,seq:no};await commit([['sales',sale],['shifts',sh],...mv.map(m=>['moves',m])]); /* stored first, on this PC */
-  cart=[];closeM();await load();rSell();pending();await printAll(sale);syncAll().then(()=>load()).then(()=>{pending();if(cur_()==='sell')rSell()})}
- catch(e){toast('Could not save sale: '+e.message)}finally{busy=false}}
+  const sh={...shift,seq:no};
+  /* 1. ATOMIC LOCAL COMMIT — if this fails, nothing else happens. */
+  await commit([['sales',sale],['shifts',sh],...mv.map(m=>['moves',m])]);
+  cart=[];closeM();
+  /* 2. LIGHTWEIGHT in-memory update (no full reload on the hot path) */
+  shift=sh;sales.push(sale);mv.forEach(m=>{stock[m.item]=(stock[m.item]||0)+(+m.qty||0)});
+  rSell();pending();
+  /* 3. FIRE SYNC in the background — do NOT await it for printing */
+  const syncTask=(NET==='POOR_NETWORK'||NET==='OFFLINE'?Promise.resolve(false):syncBurst()).then(()=>{if(cur_()==='sell')rSell()}).catch(e=>console.warn('bg sync',e));
+  /* 4. PRINT — queued immediately after local commit. If online and the ack arrives within
+        PRINT_ACK_WAIT ms we print after the ack; otherwise we print anyway. Offline prints at once. */
+  queuePrintSale(sale);
+  void syncTask;
+ }catch(e){toast('Could not save sale: '+e.message)}finally{busy=false}}
 const cur_=()=>document.querySelector('section.on').id.slice(2);
 
-/* ---------- printing (after the write has completed) ---------- */
-const printDoc=h=>new Promise(r=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(f);f.onload=()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>{f.remove();r()},300)};f.srcdoc=h});
+/* ---------- PRINTING ----------
+   Rendering runs in a hidden BrowserWindow in the Electron main process (window.sparkElectron).
+   The renderer NEVER calls window.print() / iframe.print(), so the JS event loop is never blocked.
+   Every print is queued in IndexedDB first; the queue retries automatically and can be reprinted. */
+const PRINT_ACK_WAIT=4000;   // ms to wait for a cloud ack before printing anyway (online, fresh sale)
+const PRINT_RETRY_MS=15000;  // how often the queue retries a failed job
+
 const page=()=>PP==='A4'?'@page{size:A4;margin:15mm}body{width:100%}':PP==='58mm'?'@page{size:58mm auto;margin:0}body{width:50mm;margin:4mm}':'@page{size:80mm auto;margin:0}body{width:72mm;margin:4mm}';
 const doc=b=>`<!doctype html><meta charset=utf-8><style>${page()}body{font:12px/1.35 monospace;color:#000}.r{display:flex;justify-content:space-between}hr{border:0;border-top:1px dashed #000}.c{text-align:center}img{max-height:50px}</style>${b}`;
-async function printAll(s){const d=new Date(s.at).toLocaleString(),L=s.lines,no=lbl(s);
- PP=S.paper;const cust=doc(`<div class=c>${S.logo?`<img src="${S.logo}"><br>`:''}<b>${esc(S.biz)}</b><br>Order #${esc(no)}<br>${d}</div><hr>${L.map(l=>`<div class=r><span>${l.qty} ${esc(l.name)}</span><span>${(l.price).toFixed(2)}</span></div>${l.starchName?`<div>  + ${esc(l.starchName)}</div>`:''}${(l.extraNames||[]).map(x=>`<div>  + ${esc(x)}</div>`).join('')}`).join('')}<hr><div class=r><span>Subtotal</span><span>${s.sub.toFixed(2)}</span></div>${s.vat?`<div class=r><span>VAT ${S.vatp}%</span><span>${s.vat.toFixed(2)}</span></div>`:''}<div class=r><b>TOTAL USD</b><b>${s.total.toFixed(2)}</b></div>${s.cur==='ZiG'?`<div class=r><span>Paid ZiG @${s.rate}</span><span>${(s.total*s.rate).toFixed(2)}</span></div>`:''}<div>Paid by ${METHODS[s.method]}</div><hr><div class=c>Thank you!<br>spark powered by Electrify Technologies</div>`);
- PP=S.kpaper||S.paper;const kit=doc(`<div class=c><b style="font-size:32px">#${esc(no)}</b><br>KITCHEN ${d}</div><hr>${L.map(l=>`<div><b>${l.qty} x ${esc(l.name)}</b></div>${l.starchName?`<div>  + ${esc(l.starchName)}</div>`:''}${(l.extraNames||[]).map(x=>`<div>  + ${esc(x)}</div>`).join('')}`).join('')}`);
- await printDoc(cust);const k=S.kit||'auto';if(k==='auto')await printDoc(kit);else if(k==='button')await new Promise(r=>{modal('<h3>Kitchen ticket #'+esc(no)+'</h3><p>Press Print, then choose the kitchen printer in the dialog.</p><button class="btn" id="kp" style="width:100%">Print kitchen ticket</button><button class="btn gh" id="ks" style="width:100%;margin-top:8px">Skip</button>');$('#kp').onclick=async()=>{closeM();await printDoc(kit);r()};$('#ks').onclick=()=>{closeM();r()}})}
+function receiptHtml(s){const d=new Date(s.at).toLocaleString(),L=s.lines,no=lbl(s);
+ return doc(`<div class=c>${S.logo?`<img src="${S.logo}"><br>`:''}<b>${esc(S.biz)}</b><br>Order #${esc(no)}<br>${d}</div><hr>${L.map(l=>`<div class=r><span>${l.qty} ${esc(l.name)}</span><span>${(l.price).toFixed(2)}</span></div>${l.starchName?`<div>  + ${esc(l.starchName)}</div>`:''}${(l.extraNames||[]).map(x=>`<div>  + ${esc(x)}</div>`).join('')}`).join('')}<hr><div class=r><span>Subtotal</span><span>${s.sub.toFixed(2)}</span></div>${s.vat?`<div class=r><span>VAT ${S.vatp}%</span><span>${s.vat.toFixed(2)}</span></div>`:''}<div class=r><b>TOTAL USD</b><b>${s.total.toFixed(2)}</b></div>${s.cur==='ZiG'?`<div class=r><span>Paid ZiG @${s.rate}</span><span>${(s.total*s.rate).toFixed(2)}</span></div>`:''}<div>Paid by ${METHODS[s.method]}</div><hr><div class=c>Thank you!<br>spark powered by Electrify Technologies</div>`)}
+function kitchenHtml(s){const d=new Date(s.at).toLocaleString(),L=s.lines,no=lbl(s);
+ return doc(`<div class=c><b style="font-size:32px">#${esc(no)}</b><br>KITCHEN ${d}</div><hr>${L.map(l=>`<div><b>${l.qty} x ${esc(l.name)}</b></div>${l.starchName?`<div>  + ${esc(l.starchName)}</div>`:''}${(l.extraNames||[]).map(x=>`<div>  + ${esc(x)}</div>`).join('')}`).join('')}`)}
 
-const shrink=(f,m=320)=>!f?Promise.resolve(''):new Promise(r=>{const x=new FileReader();x.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,m/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.7))};i.src=x.result};x.readAsDataURL(f)});
+/* Print-queue store. One record per ticket. Statuses: pending -> printing -> printed | failed. */
+const pqPut=r=>new Promise((ok,no)=>{const t=db.transaction('printqueue','readwrite');t.objectStore('printqueue').put(r);t.oncomplete=()=>ok(r);t.onerror=()=>no(t.error)});
+const pqAll=()=>all('printqueue');
+const pqDel=id=>new Promise((ok,no)=>{const t=db.transaction('printqueue','readwrite');t.objectStore('printqueue').delete(id);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)});
+
+async function queuePrintSale(sale){const jobs=[];
+ if(S.posPrinter)jobs.push({id:uid(),saleId:sale.id,kind:'pos',printer:S.posPrinter,html:receiptHtml(sale),status:'pending',at:Date.now(),attempts:0,error:''});
+ const kmode=S.kit||'auto';
+ if(kmode!=='off'&&S.kitPrinter)jobs.push({id:uid(),saleId:sale.id,kind:'kitchen',printer:S.kitPrinter,html:kitchenHtml(sale),status:'pending',at:Date.now(),attempts:0,error:''});
+ if(!jobs.length){toast('No printer selected. Set printers in Settings.');return}
+ for(const j of jobs)await pqPut(j);
+ /* wait for a cloud ack (online) up to PRINT_ACK_WAIT, then drain regardless */
+ const myJobIds=new Set(jobs.map(j=>j.id));
+ const wait=async()=>{
+   if(NET==='ONLINE'&&CLOUD&&navigator.onLine&&AUTH){await Promise.race([sleep(PRINT_ACK_WAIT),syncBurst().catch(()=>{})])}
+   await drainPrintQueue(myJobIds);
+ };
+ wait().catch(e=>console.warn('print',e));
+}
+async function drainPrintQueue(onlyIds){
+ if(!window.sparkElectron||!window.sparkElectron.printReceipt){ /* dev/browser: leave pending, do NOT window.print() */ pending();return }
+ const q=(await pqAll()).filter(j=>j.status==='pending'||j.status==='failed');
+ for(const j of q){
+   if(onlyIds&&!onlyIds.has(j.id))continue;
+   try{
+     await pqPut({...j,status:'printing'});
+     const r=await window.sparkElectron.printReceipt({html:j.html,printer:j.printer,pageSize:j.kind==='kitchen'?(S.kpaper||S.paper):S.paper});
+     if(r&&r.ok){await pqPut({...j,status:'printed',printedAt:Date.now()});setTimeout(()=>pqDel(j.id).catch(()=>{}),86400000)}
+     else{await pqPut({...j,status:'failed',attempts:(j.attempts||0)+1,error:(r&&r.error)||'Print failed',lastAt:Date.now()});toast('Print failed ('+j.kind+'): '+((r&&r.error)||'unknown'))}
+   }catch(e){await pqPut({...j,status:'failed',attempts:(j.attempts||0)+1,error:String(e.message||e),lastAt:Date.now()})}
+ }
+ pending();
+}
+setInterval(()=>{if(!document.hidden)drainPrintQueue().catch(()=>{})},PRINT_RETRY_MS);
+
 /* ---------- stock ---------- */
 const HINT={raw:'Ingredients you buy and count, like rolls or patties. Not sold on their own.',sales:'Made from a recipe. After you save, you go straight to Recipes & cost to add its ingredients and set its price.',ready:'Bought ready to sell, like a bottled drink. You count its stock yourself.'};
 function fType(){const f=$('#fItem'),t=f.elements.type.value;f.querySelectorAll('[data-s]').forEach(d=>d.hidden=!d.dataset.s.split(',').includes(t));$('#tHint').textContent=HINT[t]}
 $('#fItem').elements.type.onchange=fType;fType();
 $('#fItem').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),id=uid(),raw=f.type==='raw',ready=f.type==='ready',unit=raw?f.unit:'each',[base,k]=UNITS[unit];
- const it={id,name:f.name.trim(),type:raw?'raw':'sales',mk:raw?'':ready?'ready':'recipe',unit,base,f:k,cost:raw?+f.cost/k:ready?+f.cost||0:0,price:ready?+f.price||0:0,prep:raw?0:+f.prep||0,tag:raw?'':f.tag,recipe:[],active:true,createdBy:actor(),updatedBy:actor(),updatedAt:Date.now(),img:raw?'':await shrink(e.target.elements.photo.files[0])};const ops=[['items',it],['moves',auditMove(it,'PRODUCT_CREATED','product-create',null,null)]];
+ const it={id,code:(f.code||('SKU-'+uid().replace(/-/g,'').slice(0,10))).trim().toUpperCase(),name:f.name.trim(),type:raw?'raw':'sales',mk:raw?'':ready?'ready':'recipe',unit,base,f:k,cost:raw?+f.cost/k:ready?+f.cost||0:0,price:ready?+f.price||0:0,prep:raw?0:+f.prep||0,tag:raw?'':f.tag,recipe:[],active:true,createdBy:actor(),updatedBy:actor(),updatedAt:Date.now(),img:raw?'':await shrink(e.target.elements.photo.files[0])};const ops=[['items',it],['moves',auditMove(it,'PRODUCT_CREATED','product-create',null,null)]];
  if((raw||ready)&&+f.qty>0){const q=+f.qty*k;ops.push(['moves',{id:uid(),item:id,qty:q,reason:'opening',action:'OPENING_STOCK',actor:actor(),prevQty:0,newQty:q,productName:it.name,at:Date.now()}])}await save(ops);e.target.reset();fType();await load();
  if(!raw&&!ready){curR=id;show('recipes');toast('Now add the ingredients and the selling price for '+it.name)}else{rStock();toast('Item saved')}};
 const recvOpts=()=>items.filter(i=>i.active!==false&&!hasRec(i)&&(i.type==='raw'||i.mk==='ready'||(i.type==='sales'&&i.mk!=='recipe'))).sort((a,b)=>a.name.localeCompare(b.name)).map(i=>({id:i.id,label:i.name,sub:(i.type==='raw'?'Raw material':'Ready-made')+' · '+(i.unit||'each')}));
@@ -194,6 +269,46 @@ function rStock(){renderStockTable()}
 $('#stkS').onclick=()=>{const i=$('#stkQ');i.hidden=!i.hidden;if(i.hidden){i.value='';stk.q='';stk.p=0;renderStockTable()}else i.focus()};
 $('#stkQ').oninput=e=>{stk.q=e.target.value;stk.p=0;renderStockTable()};
 $('#stockList').onclick=e=>{const g=e.target.closest('[data-pg]');if(g){stk.p=Math.max(0,stk.p+(+g.dataset.pg));return renderStockTable()}const d=e.target.closest('[data-ed]');if(d)return editItem(d.dataset.ed);const del=e.target.closest('[data-del]');if(del)return archiveItem(del.dataset.del);const b=e.target.closest('[data-ph]');if(!b)return;const f=$('#phIn');f.onchange=async()=>{const img=await shrink(f.files[0]);if(img){await save([['items',{...by(b.dataset.ph),img}]]);await load();rStock()}f.value=''};f.click()};
+
+/* ---------- CSV import / export ---------- */
+function csvCell(v){const s=v==null?'':String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function toCsv(rows){return rows.map(r=>r.map(csvCell).join(',')).join('\r\n')+'\r\n'}
+function downloadText(name,text,mime){const blob=new Blob([text],{type:mime||'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const CSV_COLS=['name','code','type','unit','cost','price','prep','tag','qty','recipe'];
+function csvTemplate(){
+ const rows=[CSV_COLS,
+  ['Chicken patty','RAW-PATTY','raw','each','0.85','','','','50',''],
+  ['Burger roll','RAW-ROLL','raw','each','0.30','','','','100',''],
+  ['Cooking oil','RAW-OIL','raw','l','3.20','','','','5',''],
+  ['Cheese slice','RAW-CHEESE','raw','each','0.25','','','','80',''],
+  ['Chicken burger','BURGER-CHK','sales','each','','3.50','8','protein','','RAW-PATTY:1,RAW-ROLL:1,RAW-CHEESE:1'],
+  ['Coke 330ml','DRINK-COKE','ready','each','0.60','1.00','0','extra','48','']];
+ downloadText('spark-products-template.csv',toCsv(rows));toast('Template downloaded. Fill it in, then import below.');
+}
+function csvExport(){const rows=[CSV_COLS];items.forEach(i=>{const isRaw=i.type==='raw';rows.push([i.name||'',i.code||'',isRaw?'raw':(i.mk==='ready'?'ready':'sales'),isRaw?(i.unit||'each'):'each',isRaw?(+((i.cost||0)*(i.f||1))).toFixed(4):(i.mk==='ready'?(i.cost||0):''),isRaw?'':(i.price||''),isRaw?'':(i.prep||0),i.tag||'',(isRaw||i.mk==='ready')?(+(stock[i.id]||0)).toFixed(3):'',(i.recipe||[]).map(r=>(by(r.id)?.code||r.id)+':'+r.qty).join(',')])});downloadText('spark-products-'+new Date().toISOString().slice(0,10)+'.csv',toCsv(rows))}
+function parseCsv(text){const rows=[];let row=[],cell='',i=0,q=false;while(i<text.length){const c=text[i];if(q){if(c==='"'){if(text[i+1]==='"'){cell+='"';i+=2;continue}q=false;i++;continue}cell+=c;i++;continue}if(c==='"'){q=true;i++;continue}if(c===','){row.push(cell);cell='';i++;continue}if(c==='\r'){i++;continue}if(c==='\n'){row.push(cell);rows.push(row);row=[];cell='';i++;continue}cell+=c;i++}if(cell!==''||row.length){row.push(cell);rows.push(row)}return rows.filter(r=>r.some(c=>String(c).trim()!==''))}
+async function csvImport(file){const text=await file.text(),rows=parseCsv(text);if(rows.length<2)return toast('CSV is empty.');
+ const head=rows[0].map(h=>String(h).trim().toLowerCase()),col=n=>head.indexOf(n);
+ if(col('name')<0||col('type')<0)return toast('CSV needs at least name and type columns.');
+ const byCode=new Map(items.filter(i=>i.code).map(i=>[String(i.code).toUpperCase(),i])),byName=new Map(items.map(i=>[String(i.name).toLowerCase(),i]));
+ const ops=[];let created=0,updated=0,skipped=0;const get=(r,n)=>{const j=col(n);return j<0?'':String(r[j]==null?'':r[j]).trim()};
+ const pendingRecipes=[];
+ for(let ri=1;ri<rows.length;ri++){const r=rows[ri],name=get(r,'name');if(!name){skipped++;continue}
+  const type=get(r,'type').toLowerCase(),code=(get(r,'code')||('SKU-'+name.toUpperCase().replace(/[^A-Z0-9]+/g,'-').slice(0,20))).toUpperCase(),unitRaw=(get(r,'unit')||'each').toLowerCase(),[base,k]=UNITS[unitRaw]||UNITS.each,costIn=Math.max(0,+get(r,'cost')||0),priceIn=Math.max(0,+get(r,'price')||0),qtyIn=Math.max(0,+get(r,'qty')||0);
+  const ex=byCode.get(code)||byName.get(name.toLowerCase());
+  if(type==='raw'){const it={...(ex||{}),id:ex?.id||uid(),code,name,type:'raw',mk:'',unit:unitRaw,base,f:k,cost:costIn/k,price:0,prep:0,tag:'',recipe:ex?.recipe||[],active:true,createdBy:ex?.createdBy||actor(),updatedBy:actor(),updatedAt:Date.now(),img:ex?.img||''};ops.push(['items',it]);if(!ex&&qtyIn>0)ops.push(['moves',{id:uid(),item:it.id,qty:qtyIn*k,reason:'opening',action:'OPENING_STOCK',actor:actor(),prevQty:0,newQty:qtyIn*k,productName:name,at:Date.now()}]);if(!ex)byCode.set(code,it);ex?updated++:created++}
+  else if(type==='ready'){const it={...(ex||{}),id:ex?.id||uid(),code,name,type:'sales',mk:'ready',unit:'each',base:'each',f:1,cost:costIn,price:priceIn,prep:+get(r,'prep')||0,tag:get(r,'tag')||'',recipe:[],active:true,createdBy:ex?.createdBy||actor(),updatedBy:actor(),updatedAt:Date.now(),img:ex?.img||''};ops.push(['items',it]);if(!ex&&qtyIn>0)ops.push(['moves',{id:uid(),item:it.id,qty:qtyIn,reason:'opening',action:'OPENING_STOCK',actor:actor(),prevQty:0,newQty:qtyIn,productName:name,at:Date.now()}]);if(!ex)byCode.set(code,it);ex?updated++:created++}
+  else if(type==='sales'){pendingRecipes.push({name,code,price:priceIn,prep:+get(r,'prep')||0,tag:get(r,'tag')||'',recipe:get(r,'recipe'),ex})}
+  else skipped++}
+ const allNow=new Map([...byCode.entries()]);items.forEach(i=>{if(!allNow.has(String(i.code||'').toUpperCase()))allNow.set(String(i.code||'').toUpperCase(),i)});const nameMap=new Map(items.map(i=>[i.name.toLowerCase(),i]));
+ pendingRecipes.forEach(p=>{const ex=p.ex||byCode.get(p.code)||nameMap.get(p.name.toLowerCase()),recipe=[];if(p.recipe){p.recipe.split(',').forEach(part=>{const [key,qtyS]=part.split(':');if(!key)return;const qty=+qtyS||0,ref=allNow.get(key.trim().toUpperCase())||nameMap.get(key.trim().toLowerCase());if(ref&&qty>0)recipe.push({id:ref.id,qty})})}
+  const it={...(ex||{}),id:ex?.id||uid(),code:p.code,name:p.name,type:'sales',mk:'recipe',unit:'each',base:'each',f:1,cost:ex?.cost||0,price:p.price||ex?.price||0,prep:p.prep,tag:p.tag,recipe,active:true,createdBy:ex?.createdBy||actor(),updatedBy:actor(),updatedAt:Date.now(),img:ex?.img||''};ops.push(['items',it]);ex?updated++:created++});
+ if(!ops.length)return toast('Nothing to import.');
+ if(ops.length>480){for(let i=0;i<ops.length;i+=480)await save(ops.slice(i,i+480))}else await save(ops);
+ await load();rStock();toast(`Imported: ${created} new, ${updated} updated${skipped?', '+skipped+' skipped':''}.`)}
+$('#csvTemplate').onclick=csvTemplate;
+$('#csvExport').onclick=csvExport;
+$('#csvFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{$('#csvStatus').textContent='Importing '+f.name+'…';await csvImport(f);$('#csvStatus').textContent='Done.'}catch(x){$('#csvStatus').textContent='Import failed: '+(x.message||x);toast('CSV import failed: '+(x.message||x))}finally{e.target.value=''}};
 
 /* ---------- recipes and cost ---------- */
 let curR='',rCombo=null,rrCombo=null,rPick='';
@@ -228,22 +343,35 @@ function rShift(){const b=$('#shiftBox');
  if(!DEV){b.innerHTML='<h3>Name this PC first</h3><p class="mut">Every till needs its own name (T1, T2...) before it can open a shift.</p><button class="btn" id="dn1">Name this PC</button>';$('#dn1').onclick=devModal;return}
  if(!shift){b.innerHTML=`<h3>Start a shift on ${esc(DEV.name)}</h3><label>Opening float (USD)</label><input id="fl" type="number" step="any" value="0"><button class="btn" id="os" style="margin-top:10px">Open shift (orders restart at ${DEV.name}-0001)</button>`;
   $('#os').onclick=async()=>{await save([['shifts',{id:uid(),status:'open',by:me?me.name:'',seq:0,float:+$('#fl').value||0,at:Date.now(),dev:DEV.name}]]);await load();rShift();toast('Shift opened')};return}
- b.innerHTML=`<h3>Cash up (${esc(DEV.name)})</h3><p class="mut">Count what you hold. The expected amounts appear only after you confirm, and cannot be edited.</p>${Object.entries(METHODS).map(([k,v])=>`<div class="fg"><div><label>${v}</label><input data-m="${k}" type="number" step="any" min="0" value="0"></div><div><label>Currency</label><select data-c="${k}"><option>USD</option><option>ZiG</option></select></div></div>`).join('')}<button class="btn" id="cu" style="margin-top:10px">Confirm and close shift</button><div id="cur"></div>`;
+ b.innerHTML=`<h3>Cash up (${esc(DEV.name)})</h3><p class="mut">Count what you hold. The expected amounts appear only after you confirm, and cannot be edited.</p>${Object.entries(METHODS).map(([k,v])=>`<div class="fg"><div><label>${v}</label><input data-m="${k}" type="number" step="any" min="0" value="0"></div><div><label>Currency</label><select data-c="${k}"><option>USD</option><option>ZiG</option></select></div></div>`).join('')}<div class="panel" style="margin-top:10px"><label>Other people working this shift (comma separated)</label><input id="shiftPeople" placeholder="e.g. Tapiwa, Rudo">
+${S.stocktakeEnabled?`<h4>Closing stock count</h4><p class="mut">Count physical stock before closing. Expected quantity and variances are calculated and saved with the shift.</p><div id="stocktakeInputs"></div>`:'<p class="mut">Stock count is disabled by the administrator. Cash-up only is required.</p>'}</div>
+<button class="btn" id="cu" style="margin-top:10px">Confirm and close shift</button><div id="cur"></div>`;
+ if(S.stocktakeEnabled){const stItems=items.filter(i=>i.active!==false&&(i.type==='raw'||!hasRec(i)));$('#stocktakeInputs').innerHTML=stItems.map(i=>`<div class="fg"><div><label>${esc(i.code||i.name)} — ${esc(i.name)} (expected ${(stock[i.id]||0).toFixed(2)} ${esc(i.base||'each')})</label><input type="number" step="any" min="0" data-stockcount="${esc(i.id)}" placeholder="Physical count"></div></div>`).join('')}
  $('#cu').onclick=async()=>{$('#cu').disabled=true;const ss=sales.filter(s=>s.shiftId===shift.id),exp={},got={};
   Object.keys(METHODS).forEach(k=>{exp[k]=ss.filter(s=>s.method===k).reduce((a,s)=>a+s.total,0)+(k==='cash'?shift.float:0);const v=+document.querySelector(`[data-m=${k}]`).value||0;got[k]=document.querySelector(`[data-c=${k}]`).value==='ZiG'?v/S.rate:v});
-  const ce={at:Date.now(),exp,got};await save([['shifts',{...shift,status:'closed',cashup:ce}]]);
+  const ce={at:Date.now(),exp,got,people:($('#shiftPeople')?.value||'').split(',').map(x=>x.trim()).filter(Boolean),stocktake:null};
+  if(S.stocktakeEnabled){const counts={},variances=[];document.querySelectorAll('[data-stockcount]').forEach(inp=>{const id=inp.dataset.stockcount;if(inp.value.trim()==='')throw new Error('Enter a physical count for every stock item');const counted=Number(inp.value),expected=Number(stock[id]||0),it=by(id),variance=counted-expected,value=variance*(it?.cost||0);counts[id]={expected,counted,variance,value,code:it?.code||'',name:it?.name||id};if(Math.abs(value)>=Math.max(0,+S.alarmThreshold||0))variances.push({id,code:it?.code||'',name:it?.name||id,expected,counted,variance,value,alarm:true});else if(Math.abs(value)>0.000001)variances.push({id,code:it?.code||'',name:it?.name||id,expected,counted,variance,value,alarm:false})});
+   ce.stocktake={at:Date.now(),counts,variances,alarmThreshold:Math.max(0,+S.alarmThreshold||0),alarm:variances.some(v=>v.alarm)}}
+  await save([['shifts',{...shift,status:'closed',cashup:ce}]]);
   const rows=Object.keys(METHODS).map(k=>{const d=got[k]-exp[k];return`<div class="row"><span>${METHODS[k]}</span><span>Expected ${usd(exp[k])} | Counted ${usd(got[k])} | <b style="color:${Math.abs(d)<.005?'#2f6b4f':'#b8321a'}">${d>=0?'Over':'Short'} ${usd(Math.abs(d))}</b></span></div>`}).join('');
   const te=Object.values(exp).reduce((a,b)=>a+b,0),tg=Object.values(got).reduce((a,b)=>a+b,0);
   $('#cur').innerHTML=`<h4>Result (locked)</h4>${rows}<div class="row"><b>Total</b><b>Expected ${usd(te)} | Counted ${usd(tg)} | ${tg>=te?'Over':'Short'} ${usd(Math.abs(tg-te))}</b></div>`;await load();rSell()}}
 
 /* ---------- settings ---------- */
-async function rSet(){const f=$('#fSet');['biz','rate','vat','vatp','paper','kit','kpaper'].forEach(k=>f.elements[k].value=S[k]??'');$('#fDev').elements.dn.value=DEV?DEV.name:'';
+async function loadPrinters(){const sel1=$('#posPrinter'),sel2=$('#kitPrinter');if(!sel1||!sel2)return;
+ const fill=(sel,cur)=>{sel.innerHTML='<option value="">(none)</option>'+((window.__printersCache||[]).map(p=>`<option value="${esc(p.name)}" ${p.name===cur?'selected':''}>${esc(p.displayName||p.name)}${p.isDefault?' (default)':''}</option>`).join(''))};
+ if(window.sparkElectron&&window.sparkElectron.listPrinters){try{$('#printerStatus').textContent='Loading printers...';window.__printersCache=await window.sparkElectron.listPrinters();$('#printerStatus').textContent=window.__printersCache.length+' printer(s) found.'}catch(e){$('#printerStatus').textContent='Could not list printers: '+(e.message||e)}}
+ else{$('#printerStatus').textContent='Printer listing requires the desktop app.';window.__printersCache=[]}
+ fill(sel1,S.posPrinter);fill(sel2,S.kitPrinter)}
+async function rSet(){const f=$('#fSet');['biz','rate','vat','vatp','paper','kit','kpaper','stocktakeEnabled','alarmThreshold'].forEach(k=>{if(f.elements[k])f.elements[k].value=S[k]??(k==='stocktakeEnabled'?'false':k==='alarmThreshold'?'10':'')});$('#fDev').elements.dn.value=DEV?DEV.name:'';
+ await loadPrinters();
  const dl=$('#devList');dl.innerHTML='';if(!(CLOUD&&navigator.onLine&&AUTH&&me&&me.role==='admin'))return;
  try{const r=await post({action:'devices'});dl.innerHTML='<h4>PCs registered in the cloud</h4>'+(r.devices.map(d=>`<div class="row"><span><b>${esc(d.name)}</b><br><small class="mut">${esc(d.user)} | last seen ${new Date(d.lastSeen).toLocaleString()}</small></span><button class="btn gh" data-rel="${esc(d.name)}">Release name</button></div>`).join('')||'<p class="mut">None yet.</p>')}catch(e){}}
 $('#devList').onclick=async e=>{const b=e.target.closest('[data-rel]');if(!b)return;try{await post({action:'releaseDevice',name:b.dataset.rel});toast('Name released');rSet()}catch(x){toast(x.message)}};
-$('#fSet').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));delete f.undefined;S={...S,biz:f.biz,rate:+f.rate||32,vat:f.vat,vatp:+f.vatp||0,paper:f.paper,kit:f.kit,kpaper:f.kpaper};
+$('#savePrinters').onclick=async()=>{S.posPrinter=$('#posPrinter').value||'';S.kitPrinter=$('#kitPrinter').value||'';await save([['meta',{k:'settings',v:S},'cfg']]);toast('Printers saved');};
+$('#fSet').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));delete f.undefined;S={...S,biz:f.biz,rate:+f.rate||32,vat:f.vat,vatp:+f.vatp||0,paper:f.paper,kit:f.kit,kpaper:f.kpaper,stocktakeEnabled:f.stocktakeEnabled==='true',alarmThreshold:Math.max(0,+f.alarmThreshold||0)};
  await save([['meta',{k:'settings',v:S},'cfg']]);head();toast('Settings saved')};
-$('#fDev').onsubmit=async e=>{e.preventDefault();const name=e.target.elements.dn.value.trim().toUpperCase();if(!/^[A-Z0-9_-]{1,12}$/.test(name))return toast('Use 1-12 letters, numbers or dash.');
+$('#fDev').onsubmit=async e=>{e.preventDefault();const name=e.target.elements.dn.value.trim().toUpperCase();if(!/^[A-Z0-9 _-]{1,32}$/.test(name))return toast('Use up to 32 letters, numbers, spaces or dash.');
  if(DEV&&name!==DEV.name&&shift)return toast('Close the open shift before renaming this PC.');const d={id:DEV?DEV.id:uid(),name};
  try{if(CLOUD&&navigator.onLine&&AUTH)await post({action:'device',device:d})}catch(x){if(x.server)return toast(x.message)}
  await write([['meta',{k:'device',v:d},false]]);await load();rSet();toast('This PC is '+name)};
@@ -251,151 +379,403 @@ $('#bk').onclick=async()=>{const ob=(await all('outbox')).filter(o=>o.status!=='
 $('#logoIn').onchange=e=>{const r=new FileReader(),file=e.target.files[0];if(!file)return;r.onload=()=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas'),k=Math.min(1,300/i.width);c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);S.logo=c.toDataURL('image/png');save([['meta',{k:'settings',v:S},'cfg']]).then(head)};i.src=r.result};r.readAsDataURL(file)};
 
 /* ---------- device name ---------- */
-function devModal(){modal(`<h3>Name this PC</h3><p class="mut">Give each till its own short name, for example T1 or T2. It keeps the tills from clashing and appears on every order number. It is stored on this PC only.</p><label>Device name</label><input id="dn" maxlength="12" autocapitalize="characters" placeholder="T1"><p id="de" style="color:#b8321a"></p><button class="btn" id="ds" style="width:100%">Save</button>`,false,true);
+function devModal(){modal(`<h3>Name this PC</h3><p class="mut">Give each till a unique name, for example Chicken Till 1 or Bar Till 2. It keeps tills from clashing and appears on every order number. It is stored on this PC only.</p><label>Device name</label><input id="dn" maxlength="12" autocapitalize="characters" placeholder="T1"><p id="de" style="color:#b8321a"></p><button class="btn" id="ds" style="width:100%">Save</button>`,false,true);
  $('#ds').onclick=async()=>{const name=$('#dn').value.trim().toUpperCase();if(!/^[A-Z0-9_-]{1,12}$/.test(name))return $('#de').textContent='Use 1-12 letters, numbers or dash.';const d={id:uid(),name};
   try{if(CLOUD&&navigator.onLine&&AUTH)await post({action:'device',device:d})}catch(e){if(e.server)return $('#de').textContent=e.message}
   await write([['meta',{k:'device',v:d},false]]);closeM();await load();rSell();toast('This PC is '+name)}}
+/**
+ * SPARK POS CLOUD (Google Apps Script) v2.1  |  spark powered by Electrify Technologies
+ *
+ * SETUP
+ *  1. script.google.com > your existing project > replace ALL of Code.gs with this file.
+ *  2. Run the function  setup  once and accept permissions. It repairs/extends the sheets (never deletes data),
+ *     numbers existing rows, rebuilds CurrentStock, installs the 1-minute and nightly triggers, and (only if the
+ *     Users sheet is empty) creates a one-time administrator password shown in the execution log.
+ *  3. Deploy > Manage deployments > pencil > Version: New version > Deploy. (The /exec URL stays the same.)
+ *     First time ever: Deploy > New deployment > Web app, Execute as: Me, Who has access: Anyone.
+ *
+ * v2.1 CHANGES (vs v2)
+ *  - doGet now returns a version string so a stale deployment can be detected from the client.
+ *  - Device name conflicts REJECT the batch instead of only warning, so two tills can never share a name
+ *    (which would collide order numbers on paper).
+ *  - Sales are checked for (dev, no) uniqueness against a recent window of the Sales sheet; a duplicate
+ *    rejects the whole request so the client retries cleanly.
+ *  - Config per-field size is enforced before staging, so the 20 KB write-time truncation is unreachable.
+ *  - withLock_ tags "Busy" with retry:true so the client can treat it as a transient server signal.
+ */
+const DEFAULT_COMPANY = 'My Restaurant';
+const API_KEY = '132789ea664124be76435c6a3105e6e3c183871113464ef6';   // must equal API_KEY in index.html (light gate only; real security is the sign-in token)
+const MAX_ROWS = 500, PAGE = 500, TOKEN_DAYS = 30;
 
-/* ---------- cloud sync ---------- */
-function pending(){const n=$('#net');let m='';if(!CLOUD)m='Local only: cloud URL not set';else if(!navigator.onLine)m='Offline'+(pendRows?' | '+pendRows+' rows waiting':'');else if(me&&!AUTH)m='Sign in again to sync';else if(syncing)m='Syncing...';else if(pendRows)m=pendRows+' rows waiting';
- n.textContent=m;n.hidden=!m;n.classList.toggle('off',!!m&&m!=='Syncing...');
- const rj=$('#rj');rj.hidden=!rejList.length;rj.textContent=rejList.length+' rejected';const ng=negItems(),g=$('#neg');g.hidden=!ng.length||!(me&&me.role==='admin');g.textContent='Oversold: '+ng.length}
-$('#net').onclick=()=>{syncAll().then(()=>load()).then(pending)};
-$('#rj').onclick=()=>modal('<h3>Records the cloud refused</h3><p class="mut">These were not saved in the cloud. Read the reason, correct the cause, and tell your administrator.</p>'+rejList.map(o=>`<div class="row"><span><small class="mut">${new Date(o.at).toLocaleString()}</small><br>${esc(o.error||'Refused')}</span></div>`).join(''));
-$('#neg').onclick=()=>modal('<h3>Oversold items</h3><p class="mut">More was sold than the stock records show (two tills sold the last one, or stock was not counted). Count the shelf and correct the stock.</p>'+negItems().map(i=>`<div class="row"><span>${esc(i.name)}</span><b>${(stock[i.id]||0).toFixed(1)} ${esc(i.base||'')}</b></div>`).join(''));
-function progress(done,total,msg){const p=$('#sp');if(done===null||total<=60&&!msg){p.style.display='none';return}p.style.display='block';$('#spT').textContent=msg?'Cloud sync paused':'Uploading '+done.toLocaleString()+' of '+total.toLocaleString()+' rows';$('#spB').style.width=(total?done/total*100:0)+'%';$('#spM').textContent=msg||'Each batch is confirmed by the cloud before it counts as saved.'}
-async function post(o){const c=new AbortController(),t=setTimeout(()=>c.abort(),60000);try{const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:API_KEY,token:AUTH?AUTH.token:'',...o}),signal:c.signal,redirect:'follow'});let r;try{r=await response.json()}catch(_){throw new Error('Cloud returned an invalid response. Check the deployed /exec URL and deployment version.')}
- if(!response.ok||!r||r.ok!==true){const er=new Error((r&&r.error)||('Cloud request failed ('+response.status+').'));er.server=!!(r&&r.ok===false);er.auth=!!(r&&r.auth);er.conflict=!!(r&&r.conflict);throw er}
- if(r.token&&AUTH){AUTH={...AUTH,token:r.token};write([['meta',{k:'auth',v:AUTH},false]]).catch(()=>{})}return r}finally{clearTimeout(t)}}
-function authLost(){if(!AUTH)return;AUTH=null;write([['meta',{k:'auth',v:null},false]]).catch(()=>{});pending();toast('Your cloud session ended. Sales stay safe on this PC. Sign out and sign in again (online) to keep syncing.')}
-const roleOK=(role,it)=>role==='admin'||it.store==='sales'||it.store==='shifts'||(it.store==='moves'&&it.data.reason==='sale'&&+it.data.qty<0);
-/* One upload at a time (queued). Pending batches go oldest first in chunks of at most 500 rows. A batch is marked synced ONLY when the cloud
-   confirms it was written and read back. Anything not confirmed stays pending and is re-sent; the cloud ignores repeats by id. */
-let sq=Promise.resolve(),inflight=0,devWarned=false;
-function syncAll(){inflight++;const run=async()=>{try{return await syncOnce()}finally{inflight--}};sq=sq.then(run,run);return sq}
-async function syncOnce(){if(!CLOUD||!navigator.onLine||!AUTH||!me)return false;let total=0,sent=0;
- try{const rows=(await all('outbox')).filter(o=>o.status==='pending'&&itemsOf(o).every(it=>roleOK(me.role,it))).sort((a,b)=>a.at-b.at);total=rows.reduce((a,o)=>a+itemsOf(o).length,0);if(!total)return true;
-  syncing=true;pending();
-  while(rows.length){const ch=[];let n=0;while(rows.length&&(!ch.length||n+itemsOf(rows[0]).length<=ROWS)){const o=rows.shift();ch.push(o);n+=itemsOf(o).length}
-   progress(sent,total);
-   const r=await post({action:'sync',device:DEV,ops:ch.map(o=>({id:o.id,at:o.at,items:itemsOf(o)}))});
-   if(!r.verified)throw new Error('The cloud did not verify the write');
-   const ack=new Set(r.acked||[]),rej=new Map((r.rejected||[]).map(x=>[x.id,x.error])),upd=[];
-   ch.forEach(o=>{if(ack.has(o.id))upd.push(['outbox',{...o,status:'synced',syncedAt:Date.now()},false]);else if(rej.has(o.id))upd.push(['outbox',{...o,status:'rejected',error:rej.get(o.id)},false])});
-   if(r.stock&&(!SB||r.stock.v>=SB.v)){upd.push(['meta',{k:'stockBase',v:{v:r.stock.v,q:r.stock.q,seq:r.stock.seq}},false]);SB={v:r.stock.v,q:r.stock.q,seq:r.stock.seq}}
-   if(upd.length)await write(upd);
-   if(ch.some(o=>!ack.has(o.id)&&!rej.has(o.id)))throw new Error('The cloud did not confirm every batch');
-   if(r.devConflict&&!devWarned){devWarned=true;toast('Another PC is also using the name '+(DEV&&DEV.name)+'. Rename one of them in Settings.')}
-   sent+=n;progress(sent,total)}
-  progress(null,0);await load();return true}
- catch(e){console.warn('sync',e);if(e.auth)authLost();else if(total>60)progress(sent,total,'Stopped: '+e.message+' Retrying automatically...');return false}
- finally{syncing=false;pending()}}
-async function pullAll(){if(!CLOUD||!navigator.onLine||!AUTH||!me)return false;
- const iM=new Map(items.map(x=>[x.id,x])),shM=new Map(shifts.map(x=>[x.id,x])),uM=new Map(users.map(x=>[x.id,x])),mI=new Set(moves.map(x=>x.id)),sI=new Set(sales.map(x=>x.id)),ls=(await all('meta')).find(x=>x.k==='settings');
- for(let g=0;g<500;g++){const r=await post({action:'pull',cursors:{...SY.c},dev:DEV?DEV.name:''}),ops=[];
-  (r.items.rows||[]).forEach(x=>{const l=iM.get(x.id);if(!l||x.ts>l.ts){const v=l&&l.img&&String(l.img).startsWith('data:')&&x.img?{...x,img:l.img}:x;ops.push(['items',v,false]);iM.set(x.id,v)}});
-  (r.shifts.rows||[]).forEach(x=>{const l=shM.get(x.id);if(!l||x.ts>l.ts){ops.push(['shifts',x,false]);shM.set(x.id,x)}});
-  (r.moves.rows||[]).forEach(x=>{if(!mI.has(x.id)){ops.push(['moves',x,false]);mI.add(x.id)}});
-  (r.sales.rows||[]).forEach(x=>{if(!sI.has(x.id)){ops.push(['sales',x,false]);sI.add(x.id)}});
-  (r.users.rows||[]).forEach(x=>{const v={...(uM.get(x.id)||{}),...x};ops.push(['users',v,false]);uM.set(x.id,v)});
-  const c={...SY.c};['items','shifts','moves','sales','users'].forEach(k=>{if(r[k])c[k]=r[k].cursor});
-  if(r.config){c.config=r.config.sq;if(r.config.ts>((ls&&ls.ts)||0)){const v={...S,...r.config.v};v.rate=+v.rate||32;v.vatp=+v.vatp||0;ops.push(['meta',{k:'settings',v,ts:r.config.ts},false])}}
-  const more=['items','shifts','moves','sales','users'].some(k=>r[k]&&r[k].more);SY={c,seq:more?(SY.seq||0):r.seq};ops.push(['meta',{k:'sync',v:SY},false]);await write(ops);if(!more)break}
- return true}
-async function fetchStock(){const r=await post({action:'stock',v:SB?SB.v:-1});let ch=false;
- if(!r.same&&(!SB||r.v>=SB.v)){await write([['meta',{k:'stockBase',v:{v:r.v,q:r.q,seq:r.seq}},false]]);SB={v:r.v,q:r.q,seq:r.seq};ch=true}
- return{r,ch}}
-async function startSync(){if(!CLOUD||!navigator.onLine||!AUTH||!me)return;try{await syncAll();await fetchStock();await pullAll();await load();softRefresh()}catch(e){if(e.auth)authLost()}}
-function softRefresh(){head();pending();if(!me||$('#modal').classList.contains('on'))return;const v=cur();if(v==='sell')rSell();else if(v==='stock')renderStockTable()}
-/* Every 5 seconds: ask the cloud for the current stock (one small cached figure). Only when its sequence number moved do we pull what changed. */
-async function poll(){if(polling||!CLOUD||!navigator.onLine||!me||!AUTH)return;polling=true;
- try{if(pendRows>0&&!inflight)await syncAll();
-  const f=await fetchStock();let ch=f.ch;
-  if(f.r.seq>(SY.seq||0)){await pullAll();ch=true}
-  if(ch){await load();softRefresh()}else pending()}
- catch(e){if(e.auth)authLost()}finally{polling=false}}
-let pt=0;setInterval(()=>{pt++;if(document.hidden&&pt%6)return;poll()},5000);
-addEventListener('online',()=>{pending();startSync()});addEventListener('offline',pending);document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+const P = PropertiesService.getScriptProperties();
+const CC = CacheService.getScriptCache();
 
-/* ---------- install pop-up ---------- */
-let ip=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;ask()});
-function ask(){if(matchMedia('(display-mode:standalone)').matches||localStorage.noInst)return;const ios=/iphone|ipad/i.test(navigator.userAgent);if(!ip&&!ios)return;
- modal(`<h3>Install spark POS</h3><p>Open it like an app and keep selling when the network drops.</p>${ios&&!ip?'<p>On iPhone: tap Share, then Add to Home Screen.</p>':''}${ip?'<button class="btn" id="inst" style="width:100%">Install</button>':''}<button class="btn gh" id="no" style="width:100%;margin-top:8px">Not now</button>`);
- if($('#inst'))$('#inst').onclick=async()=>{closeM();ip.prompt();await ip.userChoice;ip=null};$('#no').onclick=()=>{localStorage.noInst=1;closeM()}}
+// txt = text columns (stored as plain text so Sheets never treats a value as a formula, date or number)
+// sq  = server sequence number used by cursor pulls
+const SCHEMA = {
+  items:  { sheet: 'Products', upsert: true,
+            cols: ['id','name','type','unit','base','f','cost','price','prep','tag','recipe','imageUrl','active','ts','updatedAt','mk','sq','code'],
+            txt: ['id','name','type','unit','base','tag','imageUrl','mk','code'], json: ['recipe'], bool: ['active'],
+            num: ['f','cost','price','prep','ts','updatedAt','sq'], nb: [], alias: { imageUrl: 'img' }, secret: [] },
+  users:  { sheet: 'Users', upsert: true,
+            cols: ['id','username','name','role','hash','active','ts','updatedAt','sq'],
+            txt: ['id','username','name','role','hash'], json: [], bool: ['active'],
+            num: ['ts','updatedAt','sq'], nb: [], alias: {}, secret: ['hash'] },
+  shifts: { sheet: 'Shifts', upsert: true,
+            cols: ['id','status','by','seq','float','at','cashup','ts','updatedAt','dev','sq'],
+            txt: ['id','status','by','dev'], json: ['cashup'], bool: [],
+            num: ['seq','float','at','ts','updatedAt','sq'], nb: [], alias: {}, secret: [] },
+  moves:  { sheet: 'StockMovements', upsert: false,
+            cols: ['id','item','qty','reason','ref','at','updatedAt','actor','action','prevQty','newQty','productName','details','sq'],
+            txt: ['id','item','reason','ref','actor','action','productName','details'], json: [], bool: [],
+            num: ['qty','at','updatedAt','prevQty','newQty','sq'], nb: ['prevQty','newQty'], alias: {}, secret: [] },
+  sales:  { sheet: 'Sales', upsert: false,
+            cols: ['id','no','shiftId','by','method','cur','rate','sub','vat','total','cost','at','lines','updatedAt','dev','sq'],
+            txt: ['id','shiftId','by','method','cur','dev'], json: ['lines'], bool: [],
+            num: ['no','rate','sub','vat','total','cost','at','updatedAt','sq'], nb: [], alias: {}, secret: [] }
+};
+const EXTRA_SHEETS = [
+  { name: 'Config',       cols: ['key','value'],                          txt: ['key','value'] },
+  { name: 'Ops',          cols: ['opId','appliedAt'],                     txt: ['opId'] },
+  { name: 'ActivityLog',  cols: ['timestamp','action','details'],         txt: ['action','details'] },
+  { name: 'CurrentStock', cols: ['id','qty','name','updatedAt'],          txt: ['id','name'] },
+  { name: 'Devices',      cols: ['name','deviceId','lastSeen','user'],    txt: ['name','deviceId','user'] }
+];
 
-/* ---------- accounts: passwords are checked by the cloud; this PC keeps a local check so a signed-in user can sign in offline ---------- */
-/* SHA-256: the browser's own when available, otherwise this small exact copy (so sign-in never depends on https). */
-const sha256js=m=>{const u=new TextEncoder().encode(m),l=u.length,n=((l+9+63)>>6)<<4,w=new Uint32Array(n),K=[],H=[],r=(x,k)=>x>>>k|x<<32-k;let i,o;
- for(let c=2,p=0;p<64;c++){let q=1;for(let j=2;j*j<=c;j++)if(c%j===0)q=0;if(q){K[p]=Math.cbrt(c)*4294967296|0;if(p<8)H[p]=Math.sqrt(c)*4294967296|0;p++}}
- for(i=0;i<l;i++)w[i>>2]|=u[i]<<24-8*(i&3);w[l>>2]|=128<<24-8*(l&3);w[n-1]=l*8;
- for(o=0;o<n;o+=16){const x=new Uint32Array(64);for(i=0;i<16;i++)x[i]=w[o+i];for(i=16;i<64;i++)x[i]=x[i-16]+(r(x[i-15],7)^r(x[i-15],18)^x[i-15]>>>3)+x[i-7]+(r(x[i-2],17)^r(x[i-2],19)^x[i-2]>>>10)|0;
-  let a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
-  for(i=0;i<64;i++){const t1=h+(r(e,6)^r(e,11)^r(e,25))+(e&f^~e&g)+K[i]+x[i]|0,t2=(r(a,2)^r(a,13)^r(a,22))+(a&b^a&c^b&c)|0;h=g;g=f;f=e;e=d+t1|0;d=c;c=b;b=a;a=t1+t2|0}
-  [a,b,c,d,e,f,g,h].forEach((v,j)=>H[j]=H[j]+v|0)}return H.map(v=>(v>>>0).toString(16).padStart(8,'0')).join('')};
-const sha=async t=>{try{if(window.crypto&&crypto.subtle)return[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){}return sha256js(t)};
-async function doLogin(un,pw){let net=false;
- if(CLOUD&&navigator.onLine){loader(true);try{const r=await post({action:'login',username:un,password:pw}),u=r.user,lh=await sha(u.id+pw),rec={...(users.find(x=>x.id===u.id)||{}),...u,lh};delete rec.h;
-   AUTH={token:r.token,uid:u.id,exp:r.exp};await write([['users',rec,false],['meta',{k:'auth',v:AUTH},false]]);await load();me=users.find(x=>x.id===u.id);sessionStorage.me=u.id;return}
-  catch(e){if(e.server)throw e;net=true}finally{loader(false)}}
- const u=users.find(x=>x.username===un&&x.active!==false);
- if(!u||!(u.lh||u.h))throw new Error(net||!navigator.onLine?'The first sign-in on this PC needs internet.':'Wrong username or password');
- if(await sha(u.id+pw)!==(u.lh||u.h))throw new Error('Wrong username or password');
- me=u;sessionStorage.me=u.id;if(AUTH&&AUTH.uid!==u.id)AUTH=null}
-function enter(){$('#login').style.display='none';document.querySelectorAll('[data-r]').forEach(b=>b.hidden=me.role!=='admin');$('#who').textContent=me.name+' ('+me.role+')';show('sell');pending();if(!DEV)devModal();startSync()}
-$('#out').onclick=()=>{sessionStorage.removeItem('me');me=null;cart=[];pending();loginUI()};
-function loginUI(){const L=$('#login');L.style.display='flex';
- L.innerHTML=`<form id="lf" class="panel"><h3>${esc(S.biz)} sign in</h3><label>Username</label><input name="u" autocomplete="username" autocapitalize="none" required><label>Password</label><input name="p" type="password" autocomplete="current-password" required><p id="le" style="color:#b8321a"></p><button class="btn" style="width:100%">Sign in</button></form>`;
- let fails=0;$('#lf').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),un=f.u.trim().toLowerCase();if(fails>=5)return $('#le').textContent='Too many tries. Reload the app.';
-  const b=e.target.querySelector('button');b.disabled=true;try{await doLogin(un,f.p);enter()}catch(x){fails++;$('#le').textContent=x.message||'Wrong username or password'}finally{b.disabled=false}}}
-function rUsers(){lazy($('#ul'),users.slice().sort((a,b)=>a.name.localeCompare(b.name)),u=>`<div class="row"><span><b>${esc(u.name)}</b><br><small class="mut">${esc(u.username)} | ${u.role}${u.active===false?' (disabled)':''}</small></span><button class="btn gh" data-eu="${u.id}">Edit</button></div>`,8)}
-async function saveUserCloud(u){if(!CLOUD||!navigator.onLine||!AUTH)throw new Error('Users can only be created or changed while online and signed in.');loader(true);try{await post({action:'saveUser',...u});const r=await post({action:'users'});await write((r.users||[]).map(x=>['users',{...(users.find(y=>y.id===x.id)||{}),...x},false]));await load()}finally{loader(false)}}
-$('#fUser').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));try{await saveUserCloud({name:f.n,username:f.un,role:f.role,password:f.p})}catch(x){return toast(x.message)}e.target.reset();rUsers();toast('User created')};
-$('#ul').onclick=e=>{const b=e.target.closest('[data-eu]');if(b)editUser(b.dataset.eu)};
-function editUser(id){const u=users.find(x=>x.id===id),self=me&&u.id===me.id;
- modal(`<h3>Edit user</h3><form id="fe"><label>Name</label><input name="n" value="${esc(u.name)}" required><label>Username</label><input name="un" value="${esc(u.username)}" required><label>Role</label><select name="role" ${self?'disabled':''}><option ${u.role==='cashier'?'selected':''}>cashier</option><option ${u.role==='admin'?'selected':''}>admin</option></select><label>New password (blank keeps the current one, 6+ characters)</label><input name="p" type="password" minlength="6"><label>Status</label><select name="a" ${self?'disabled':''}><option value="1">Active</option><option value="0" ${u.active===false?'selected':''}>Disabled</option></select><button class="btn" style="width:100%;margin-top:10px">Save</button></form>`);
- $('#fe').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));try{await saveUserCloud({id:u.id,name:f.n,username:f.un,role:self?u.role:f.role,active:self?true:f.a==='1',password:f.p||''})}catch(x){return toast(x.message)}closeM();me=users.find(x=>x.id===me.id)||me;rUsers();toast('Saved')}}
-/* ---------- edit a product ---------- */
-function editItem(id){const i=by(id);if(!i)return;const raw=i.type==='raw',u=i.unit||'each';
- modal(`<h3>Edit ${esc(i.name)}</h3><p class="mut" style="margin:0">Created by ${esc(i.createdBy||'Not recorded in older data')}</p><form id="fe"><label>Name</label><input name="n" value="${esc(i.name)}" required>
- <label>Product type</label><select name="type"><option value="raw" ${raw?'selected':''}>Raw material</option><option value="sales" ${!raw?'selected':''}>Sales item</option></select>
- <div id="editRaw" ${raw?'':'hidden'}><label>Unit bought in</label><select name="unit" ${raw?'disabled':''}>${['kg','g','l','ml','each'].map(x=>`<option ${x===u?'selected':''}>${x}</option>`).join('')}</select><label>Cost per unit bought (USD)</label><input name="c" type="number" step="any" min="0" value="${raw?+(i.cost*(i.f||1)).toFixed(6):i.cost}"></div>
- <div id="editSales" ${raw?'hidden':''}><label>Cost per item (USD, for ready-made products)</label><input name="scost" type="number" step="any" min="0" value="${i.cost||0}"><label>Selling price (USD)</label><input name="p" type="number" step="any" min="0" value="${i.price||0}"><label>Prep time (minutes)</label><input name="m" type="number" min="0" value="${i.prep||0}"><label>Tag</label><select name="t">${['','protein','starch','extra'].map(t=>`<option value="${t}" ${t===(i.tag||'')?'selected':''}>${t||'None'}</option>`).join('')}</select></div>
- ${!hasRec(i)?`<label>Stock count now, in base units (currently ${(stock[i.id]||0).toFixed(3)}; leave blank to keep)</label><input name="sc" type="number" step="any">`:`<p class="mut">${avail(i)} can be made from the current recipe ingredients.</p>`}
- <label>Status</label><select name="a"><option value="1">Active</option><option value="0" ${i.active===false?'selected':''}>Archived (not sold)</option></select>
- <div id="editPhoto" ${raw?'hidden':''}><label>New photo (optional)</label><input type="file" name="photo" accept="image/*"></div><button class="btn" style="width:100%;margin-top:10px">Save changes</button></form>`);
- $('#fe').elements.type.onchange=()=>{const isRaw=$('#fe').elements.type.value==='raw';$('#editRaw').hidden=!isRaw;$('#editSales').hidden=isRaw;$('#editPhoto').hidden=isRaw};
- $('#fe').onsubmit=async e=>{e.preventDefault();const btn=e.submitter||e.target.querySelector('button');if(btn.disabled)return;btn.disabled=true;
-  try{const f=Object.fromEntries(new FormData(e.target)),newRaw=f.type==='raw',img=newRaw?'':await shrink(e.target.elements.photo.files[0]),oldQty=stock[i.id]||0;let unit=newRaw?(f.unit||i.unit||'each'):'each',base,k;if(newRaw){[base,k]=UNITS[unit]||UNITS.each}else{base='each';k=1}
-   const typeChanged=(i.type==='raw')!==newRaw,recipe= newRaw?[]:(typeChanged?[]:(i.recipe||[]));
-   const updated={...i,name:f.n.trim(),type:f.type,mk:newRaw?'':(i.mk||''),unit,base,f:k,cost:newRaw?Math.max(0,+f.c||0)/k:Math.max(0,+f.scost||0),price:newRaw?0:Math.max(0,+f.p||0),prep:newRaw?0:Math.max(0,+f.m||0),tag:newRaw?'':(f.t||''),recipe,active:f.a==='1',img:newRaw?'':(img||i.img||''),createdBy:i.createdBy||actor(),updatedBy:actor(),updatedAt:Date.now()};
-   const ops=[['items',updated],['moves',auditMove(i,typeChanged?'PRODUCT_TYPE_CHANGED':'PRODUCT_EDITED',typeChanged?'product-type-change':'product-edit',oldQty,typeChanged?0:oldQty,{productName:updated.name,details:typeChanged?`${i.type} -> ${updated.type}; stock reset to zero to prevent unit/type mismatch. Re-enter the correct opening quantity.`:'Product details updated'})]];
-   // Keep historical movements but neutralize the old live balance when type changes, so raw grams/ml are never sold as item counts.
-   if(typeChanged&&Math.abs(oldQty)>1e-9)ops.push(['moves',{id:uid(),item:i.id,qty:-oldQty,reason:'type-change-reset',action:'STOCK_RESET_ON_TYPE_CHANGE',actor:actor(),prevQty:oldQty,newQty:0,productName:updated.name,at:Date.now(),details:'Balance reset during type conversion; enter the correct stock count after conversion.'}]);
-   if(!typeChanged&&f.sc!==undefined&&f.sc!==''&&isFinite(+f.sc)){const d=+f.sc*(k||1)-oldQty;if(Math.abs(d)>1e-9){const next=oldQty+d;if(next< -1e-8)throw new Error('Stock cannot be negative.');ops.push(['moves',{id:uid(),item:i.id,qty:d,reason:'adjust',action:'STOCK_COUNT_ADJUSTED',actor:actor(),prevQty:oldQty,newQty:next,productName:updated.name,at:Date.now()}])}}
-   await save(ops);closeM();await load();rStock();toast(typeChanged?'Product type changed; stock history retained.':'Product updated')}
-  catch(x){btn.disabled=false;toast(x.message)}}}
-async function archiveItem(id){const i=by(id);if(!i)return;modal(`<h3>Archive ${esc(i.name)}?</h3><p>This hides the product from new sales but keeps past sales, recipes, stock movements and audit history. It is safer than permanently deleting a product that may have been used.</p><button class="btn" id="confirmArchive" style="width:100%">Archive product</button><button class="btn gh" id="cancelArchive" style="width:100%;margin-top:8px">Cancel</button>`);$('#cancelArchive').onclick=closeM;$('#confirmArchive').onclick=async()=>{try{await save([['items',{...i,active:false,updatedBy:actor(),updatedAt:Date.now()}],['moves',auditMove(i,'PRODUCT_ARCHIVED','product-archive',stock[i.id]||0,stock[i.id]||0)]]);closeM();await load();rStock();toast('Product archived; history preserved')}catch(e){toast(e.message)}}}
-/* ---------- reports: each tab loads only when opened ---------- */
-let rtab='ov';const inR=s=>!(+$('#rg').value)||s.at>Date.now()-$('#rg').value*864e5;
-function rReports(){loadRep(rtab)}$('#rt').onclick=e=>{if(e.target.dataset.t){rtab=e.target.dataset.t;rReports()}};$('#rg').onchange=rReports;
-async function loadRep(t){const b=$('#rb');b.innerHTML='<div class="sk"></div><div class="sk"></div>';await new Promise(r=>setTimeout(r));document.querySelectorAll('#rt button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));const ss=sales.filter(inR);
- if(t==='ov'){const rev=ss.reduce((a,s)=>a+s.sub,0),cost=ss.reduce((a,s)=>a+s.cost,0),vat=ss.reduce((a,s)=>a+s.vat,0),d={};
-  ss.forEach(s=>{const k=new Date(s.at).toISOString().slice(5,10);d[k]=d[k]||{r:0,p:0};d[k].r+=s.sub;d[k].p+=s.sub-s.cost});const ks=Object.keys(d).sort().slice(-14),mx=Math.max(1,...ks.map(k=>d[k].r));
-  const bars=ks.map((k,i)=>{const x=14+i*44,hr=d[k].r/mx*110,hp=Math.max(0,d[k].p)/mx*110;return`<rect x="${x}" y="${120-hr}" width="16" height="${hr}" fill="#1d2321"/><rect x="${x+18}" y="${120-hp}" width="16" height="${hp}" fill="#2f6b4f"/><text x="${x}" y="136" font-size="9">${k}</text>`}).join('');
-  b.innerHTML=`<div class="kpi"><div>Revenue<b>${usd(rev)}</b></div><div>Cost<b>${usd(cost)}</b></div><div>Profit<b>${usd(rev-cost)}</b></div><div>Margin<b>${rev?((rev-cost)/rev*100).toFixed(0):0}%</b></div><div>Orders<b>${ss.length}</b></div><div>VAT collected<b>${usd(vat)}</b></div></div><div class="panel"><b>Revenue vs profit</b> <small class="mut">dark: revenue, green: profit</small>${ks.length?`<svg viewBox="0 0 ${ks.length*44+20} 144" style="width:100%;max-height:220px">${bars}</svg>`:'<p class="mut">No sales in this period.</p>'}</div>`}
- else if(t==='stk'){const v=items.reduce((a,i)=>a+(hasRec(i)?0:Math.max(0,stock[i.id]||0)*(i.cost||0)),0);b.innerHTML=`<div class="kpi"><div>Stock value<b>${usd(v)}</b></div></div><div class="panel" id="rl"></div>`;lazy($('#rl'),items.slice().sort((a,c)=>(hasRec(a)?avail(a):stock[a.id]||0)-(hasRec(c)?avail(c):stock[c.id]||0)),i=>{const q=hasRec(i)?avail(i):(stock[i.id]||0);return`<div class="row"><span>${esc(i.name)}<br><small class="mut">${i.type==='raw'?'Raw':hasRec(i)?'Recipe item':'Sales'}</small></span><span><b style="color:${q<=0?'#b8321a':'inherit'}">${hasRec(i)?q+' can be made':q.toFixed(i.base==='each'?0:1)+' '+(i.base||'')}</b><br><small class="mut">${hasRec(i)?'':usd(q*(i.cost||0))}</small></span></div>`})}
- else if(t==='updates'){const now=new Date(),defEnd=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10),defStart=new Date(now.getTime()-7*864e5-now.getTimezoneOffset()*60000).toISOString().slice(0,10);b.innerHTML=`<div class="panel"><b>Stock and product audit trail</b><div class="fg"><div><label>From date</label><input type="date" id="auditFrom" value="${defStart}"></div><div><label>To date</label><input type="date" id="auditTo" value="${defEnd}"></div></div><button class="btn alt" id="auditApply" style="margin-top:8px">Apply dates</button><p class="mut">Includes stock received/corrected, stock deducted by sales, product edits/type changes/archive, and recipe changes. Older events are shown only if they were logged.</p></div><div class="panel" id="auditRows"></div>`;const renderAudit=()=>{const from=$('#auditFrom').value?new Date($('#auditFrom').value+'T00:00:00').getTime():0,to=$('#auditTo').value?new Date($('#auditTo').value+'T23:59:59.999').getTime():Infinity;const list=moves.filter(m=>(+m.at||0)>=from&&(+m.at||0)<=to).sort((a,c)=>(+c.at||0)-(+a.at||0));lazy($('#auditRows'),list,m=>`<div class="row"><span><b>${esc(m.productName||by(m.item)?.name||m.item||'-')}</b><br><small class="mut">${esc(m.action||m.reason||'Stock movement')} · ${esc(m.actor||'Actor not recorded')}<br>${new Date(+m.at||0).toLocaleString()}${m.details?'<br>'+esc(m.details):''}</small></span><span style="text-align:right">${m.prevQty!==''&&m.prevQty!=null?`<small>Before ${(+m.prevQty).toFixed(3)}<br>After ${(+m.newQty).toFixed(3)}</small><br>`:''}${Math.abs(+m.qty||0)>1e-9?`<b>${(+m.qty)>0?'+':''}${(+m.qty).toFixed(3)}</b>`:''}<br><small class="mut">${esc(m.reason||'')}</small></span></div>`)};$('#auditApply').onclick=renderAudit;renderAudit()}
- else if(t==='cash'){const m={};ss.forEach(s=>m[s.method]=(m[s.method]||0)+s.total);const sh=(await all('shifts')).filter(x=>x.cashup&&inR({at:x.at})).sort((a,c)=>c.at-a.at);
-  b.innerHTML=`<div class="kpi">${Object.entries(METHODS).map(([k,v])=>`<div>${v}<b>${usd(m[k]||0)}</b></div>`).join('')}</div><div class="panel"><b>Closed shifts</b><div id="rl"></div></div>`;
-  lazy($('#rl'),sh,x=>{const e=Object.values(x.cashup.exp).reduce((a,c)=>a+c,0),g=Object.values(x.cashup.got).reduce((a,c)=>a+c,0);return`<div class="row"><span>${esc(x.by||'')} ${esc(x.dev||'')}<br><small class="mut">${new Date(x.at).toLocaleString()}</small></span><span>Expected ${usd(e)}<br>${g>=e?'Over':'Short'} ${usd(Math.abs(g-e))}</span></div>`})}
- else{b.innerHTML='<div class="panel" id="rl"></div>';lazy($('#rl'),ss.slice().sort((a,c)=>c.at-a.at),s=>`<div class="row"><span><b>#${esc(lbl(s))}</b> ${esc(s.by||'')}<br><small class="mut">${new Date(s.at).toLocaleString()} ${METHODS[s.method]}</small></span><b>${usd(s.total)}</b></div>`)}}
-/* ---------- start ---------- */
-(async()=>{$('#menu').innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
- try{db=await open()}catch(e){document.body.innerHTML='<p style="padding:20px">This browser cannot store data on this device ('+esc(e.message)+'). Close private/incognito mode and reload.</p>';return}
- if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
- await load();head();
- const sid=sessionStorage.me;me=users.find(u=>u.id===sid&&u.active!==false)||null;if(me&&AUTH&&AUTH.uid!==me.id)AUTH=null;
- pending();me?enter():loginUI();
- if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(()=>{});setTimeout(ask,1500)})();
+/* ======================= setup / repair ======================= */
+function setup() {
+  let ss, folder;
+  if (P.getProperty('SS_ID')) {
+    ss = SpreadsheetApp.openById(P.getProperty('SS_ID'));
+    folder = DriveApp.getFolderById(P.getProperty('FOLDER_ID'));
+  } else {
+    const name = DEFAULT_COMPANY.replace(/[\\/:*?"<>|]/g, '-');
+    folder = DriveApp.createFolder(name);
+    ss = SpreadsheetApp.create(name);
+    DriveApp.getFileById(ss.getId()).moveTo(folder);
+    P.setProperties({ SS_ID: ss.getId(), FOLDER_ID: folder.getId() });
+  }
+  const defs = Object.keys(SCHEMA).map(k => ({ name: SCHEMA[k].sheet, cols: SCHEMA[k].cols, txt: SCHEMA[k].txt })).concat(EXTRA_SHEETS);
+  defs.forEach(d => {
+    let sh = ss.getSheetByName(d.name);
+    if (!sh) {
+      const first = ss.getSheets()[0];
+      sh = (ss.getSheets().length === 1 && first.getLastRow() === 0 && first.getName().indexOf('Sheet') === 0) ? first.setName(d.name) : ss.insertSheet(d.name);
+    }
+    if (sh.getLastRow() === 0) sh.appendRow(d.cols);
+    else {
+      const existing = sh.getRange(1, 1, 1, Math.max(1, sh.getLastColumn())).getValues()[0].map(String);
+      d.cols.forEach(c => { if (!existing.includes(c)) { const col = existing.length + 1; sh.getRange(1, col).setValue(c); existing.push(c); } });
+    }
+    const head = sh.getRange(1, 1, 1, d.cols.length).getValues()[0].map(String);
+    d.cols.forEach((c, i) => { if (head[i] !== c) throw new Error('Sheet "' + d.name + '" has column "' + head[i] + '" where "' + c + '" is expected (column ' + (i + 1) + '). Rename or move the columns so they match: ' + d.cols.join(', ')); });
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, d.cols.length).setBackground('#102a43').setFontColor('#ffffff').setFontWeight('bold');
+    d.txt.forEach(c => { const i = d.cols.indexOf(c); if (i >= 0) sh.getRange(1, i + 1, sh.getMaxRows(), 1).setNumberFormat('@'); });
+  });
+  if (!folder.getFoldersByName('Images').hasNext()) folder.createFolder('Images');
+  if (!P.getProperty('SECRET')) P.setProperty('SECRET', Utilities.getUuid() + Utilities.getUuid());
+  CC.remove('SEC'); CC.remove('UMAP');
+  seedAdmin_(ss);
+  const lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try {
+    backfillSeq_(ss);
+    const rc = recountCompute_(ss); writeStock_(ss, rc);
+    publishStock_(rc.q, true);
+  } finally { lock.releaseLock(); }
+  installTriggers_();
+  Logger.log('Ready.\nSpreadsheet: ' + ss.getUrl() + '\nFolder: ' + folder.getUrl() + '\nNow Deploy > Manage deployments > New version (or New deployment > Web app) and keep the /exec URL in index.html (API_URL).');
+}
+function authorizeServices() { setup(); }
 
-</script></body></html>
+function installTriggers_() {
+  ScriptApp.getProjectTriggers().forEach(t => { const h = t.getHandlerFunction(); if (h === 'tick' || h === 'nightlyAudit') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('tick').timeBased().everyMinutes(1).create();
+  ScriptApp.newTrigger('nightlyAudit').timeBased().atHour(2).everyDays(1).create();
+}
+
+function seedAdmin_(ss) {
+  const sh = ss.getSheetByName('Users');
+  if (sh.getLastRow() >= 2) return;
+  const password = Utilities.getUuid().replace(/-/g, '').slice(0, 16) + 'A9!';
+  const row = SCHEMA.users.cols.map(c => ({ id: 'user-admin', username: 'admin', name: 'Administrator', role: 'admin', hash: sha256hex_('user-admin' + password), active: true, ts: 0, updatedAt: Date.now(), sq: 0 })[c]);
+  sh.getRange(2, 1, 1, row.length).setValues([row]);
+  log_(ss, 'SETUP', 'Administrator account created (password shown once in the execution log).');
+  Logger.log('INITIAL ADMIN LOGIN - username: admin | password: ' + password + ' | Change this password immediately after signing in.');
+}
+
+function backfillSeq_(ss) {
+  let seq = Number(P.getProperty('SEQ')) || 0;
+  Object.keys(SCHEMA).forEach(k => {
+    const sc = SCHEMA[k], sh = ss.getSheetByName(sc.sheet), last = sh.getLastRow();
+    if (last < 2) return;
+    const col = sc.cols.indexOf('sq') + 1, r = sh.getRange(2, col, last - 1, 1), v = r.getValues();
+    v.forEach(x => { const n = Number(x[0]) || 0; if (n > seq) seq = n; });
+    let changed = false;
+    v.forEach(x => { if (!(Number(x[0]) > 0)) { x[0] = ++seq; changed = true; } });
+    if (changed) r.setValues(v);
+  });
+  P.setProperties({ SEQ: String(seq), SEQ_DONE: String(seq) });
+}
+
+/* ======================= small helpers ======================= */
+function ss_() { return SpreadsheetApp.openById(P.getProperty('SS_ID')); }
+function out(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+function log_(ss, a, d) { try { ss.getSheetByName('ActivityLog').appendRow([new Date().toISOString(), a, String(d).slice(0, 2000)]); } catch (e) {} }
+function pub_(msg) { const e = new Error(msg); e.pub = true; return e; }
+function sha256hex_(s) { return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, s, Utilities.Charset.UTF_8).map(b => ('0' + (b & 255).toString(16)).slice(-2)).join(''); }
+function ensureRows_(sh, needed) { const have = sh.getMaxRows(); if (needed > have) sh.insertRowsAfter(have, needed - have + 200); }
+function withLock_(fn) {
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(25000); } catch (x) { return { ok: false, error: 'Busy, retry', retry: true }; }
+  try { return fn(); } finally { lock.releaseLock(); }
+}
+function doGet() { return out({ ok: true, service: 'spark POS cloud', version: '2.1', ready: !!P.getProperty('SS_ID') }); }
+
+/* ======================= tokens and users ======================= */
+function secret_() {
+  let s = CC.get('SEC');
+  if (!s) { s = P.getProperty('SECRET'); if (!s) throw new Error('Not set up'); CC.put('SEC', s, 21600); }
+  return s;
+}
+function sign_(payload) {
+  const b = Utilities.base64EncodeWebSafe(JSON.stringify(payload));
+  return b + '.' + Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(b, secret_()));
+}
+function verify_(tok) {
+  if (!tok || typeof tok !== 'string') return null;
+  const p = tok.split('.'); if (p.length !== 2) return null;
+  if (Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(p[0], secret_())) !== p[1]) return null;
+  let pl; try { pl = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(p[0])).getDataAsString()); } catch (e) { return null; }
+  if (!pl || !pl.u || !(Number(pl.e) > Date.now())) return null;
+  const u = userMap_()[pl.u];
+  if (!u || u.active === false) return null;
+  return { u: u, e: Number(pl.e) };
+}
+function userMap_() {
+  const c = CC.get('UMAP'); if (c) return JSON.parse(c);
+  const sh = ss_().getSheetByName('Users'), sc = SCHEMA.users, n = sh.getLastRow() - 1, m = {};
+  if (n > 0) sh.getRange(2, 1, n, sc.cols.length).getValues().forEach(r => { const o = rowObj_(sc, r); m[o.id] = { id: o.id, username: o.username, name: o.name, role: o.role, active: o.active !== false }; });
+  CC.put('UMAP', JSON.stringify(m), 300);
+  return m;
+}
+function publicUser_(o) { return { id: o.id, username: o.username, name: o.name, role: o.role, active: o.active !== false, ts: Number(o.ts) || 0 }; }
+
+function doLogin_(req) {
+  const un = String(req.username || '').trim().toLowerCase(), pw = String(req.password || '');
+  if (!un || !pw) return { ok: false, error: 'Enter username and password' };
+  const fk = 'LF_' + un.replace(/[^a-z0-9._-]/g, '_').slice(0, 40), fails = Number(CC.get(fk)) || 0;
+  if (fails >= 5) return { ok: false, error: 'Too many wrong attempts. Try again in 10 minutes.' };
+  const sh = ss_().getSheetByName('Users'), sc = SCHEMA.users, n = sh.getLastRow() - 1;
+  let found = null;
+  if (n > 0) sh.getRange(2, 1, n, sc.cols.length).getValues().forEach(r => { const o = {}; sc.cols.forEach((c, i) => o[c] = r[i]); if (String(o.username).toLowerCase() === un) found = o; });
+  const active = found && (found.active === true || String(found.active).toLowerCase() === 'true');
+  if (!(found && active && sha256hex_(String(found.id) + pw) === String(found.hash))) { CC.put(fk, String(fails + 1), 600); return { ok: false, error: 'Wrong username or password' }; }
+  CC.remove(fk);
+  const exp = Date.now() + TOKEN_DAYS * 864e5;
+  return { ok: true, token: sign_({ u: String(found.id), e: exp }), exp: exp, user: publicUser_({ id: found.id, username: found.username, name: found.name, role: found.role, active: true, ts: found.ts }), now: Date.now() };
+}
+
+function saveUser_(au, req) {
+  if (au.u.role !== 'admin') return { ok: false, error: 'Admin only' };
+  const ss = ss_(), sh = ss.getSheetByName('Users'), sc = SCHEMA.users, n = sh.getLastRow() - 1;
+  const name = String(req.name || '').trim().slice(0, 80), un = String(req.username || '').trim().toLowerCase(), role = req.role === 'admin' ? 'admin' : 'cashier', active = req.active !== false, pw = String(req.password || '');
+  if (!name) return { ok: false, error: 'Enter a name' };
+  if (!/^[a-z0-9._-]{3,32}$/.test(un)) return { ok: false, error: 'Username: 3-32 letters, numbers, dot, dash or underscore' };
+  if (pw && pw.length < 6) return { ok: false, error: 'Password must be at least 6 characters' };
+  const rows = n > 0 ? sh.getRange(2, 1, n, sc.cols.length).getValues() : [];
+  const idI = sc.cols.indexOf('id'), unI = sc.cols.indexOf('username'), hI = sc.cols.indexOf('hash'), aI = sc.cols.indexOf('active'), rI = sc.cols.indexOf('role');
+  const id = String(req.id || ('user-' + Utilities.getUuid())), exI = rows.findIndex(r => String(r[idI]) === id);
+  if (exI < 0 && !pw) return { ok: false, error: 'A new user needs a password' };
+  if (rows.some((r, i) => String(r[unI]).toLowerCase() === un && i !== exI)) return { ok: false, error: 'That username is already taken.' };
+  if (exI >= 0 && id === au.u.id && (role !== 'admin' || !active)) return { ok: false, error: 'You cannot remove your own admin access' };
+  const isTrue = v => v === true || String(v).toLowerCase() === 'true';
+  const admins = rows.filter((r, i) => i !== exI && String(r[rI]) === 'admin' && isTrue(r[aI])).length + (role === 'admin' && active ? 1 : 0);
+  if (admins < 1) return { ok: false, error: 'At least one active admin is required' };
+  const seq = (Number(P.getProperty('SEQ')) || 0) + 1, now = Date.now();
+  P.setProperty('SEQ', String(seq));
+  const hash = pw ? sha256hex_(id + pw) : String(rows[exI][hI]);
+  const rec = { id: id, username: un, name: name, role: role, hash: hash, active: active, ts: now, updatedAt: now, sq: seq };
+  const row = sc.cols.map(c => rec[c]);
+  const rn = exI >= 0 ? exI + 2 : sh.getLastRow() + 1;
+  ensureRows_(sh, rn); sh.getRange(rn, 1, 1, row.length).setValues([row]);
+  SpreadsheetApp.flush();
+  if (String(sh.getRange(rn, 1).getValue()) !== id || Number(sh.getRange(rn, sc.cols.indexOf('sq') + 1).getValue()) !== seq) throw pub_('User write could not be verified. Try again.');
+  P.setProperty('SEQ_DONE', String(seq));
+  CC.remove('UMAP'); publishStock_(null, false);
+  log_(ss, 'USER', (exI >= 0 ? 'Updated ' : 'Created ') + un + ' (' + role + ') by ' + au.u.username);
+  return { ok: true, user: publicUser_(rec) };
+}
+function doUsers_(au) {
+  const ss = ss_(), sh = ss.getSheetByName('Users'), sc = SCHEMA.users, n = sh.getLastRow() - 1;
+  let list = n > 0 ? sh.getRange(2, 1, n, sc.cols.length).getValues().map(r => rowObj_(sc, r)) : [];
+  if (au.u.role !== 'admin') list = list.filter(u => u.id === au.u.id);
+  return { ok: true, users: list.map(publicUser_), now: Date.now() };
+}
+
+/* ======================= devices ======================= */
+function touchDevice_(ss, au, dev) {
+  if (!dev || !/^[A-Za-z0-9 _-]{1,32}$/.test(String(dev.name || '')) || !/^[\w-]{8,64}$/.test(String(dev.id || ''))) return { ok: false, conflict: false, error: 'Invalid device name (up to 32 letters, numbers, spaces or dash)' };
+  const sh = ss.getSheetByName('Devices'), n = sh.getLastRow() - 1, rows = n > 0 ? sh.getRange(2, 1, n, 4).getValues() : [];
+  const name = String(dev.name).trim().toUpperCase(), id = String(dev.id);
+  const byName = rows.findIndex(r => String(r[0]).toUpperCase() === name), byId = rows.findIndex(r => String(r[1]) === id);
+  if (byName >= 0 && String(rows[byName][1]) !== id) return { ok: false, conflict: true, error: 'The device name ' + name + ' is already used by another PC. Choose another name, or ask the admin to release it.' };
+  const row = [name, id, Date.now(), au.u.name];
+  if (byId >= 0) sh.getRange(byId + 2, 1, 1, 4).setValues([row]);
+  else { const rn = sh.getLastRow() + 1; ensureRows_(sh, rn); sh.getRange(rn, 1, 1, 4).setValues([row]); }
+  return { ok: true, conflict: false };
+}
+function listDevices_(au) {
+  if (au.u.role !== 'admin') return { ok: false, error: 'Admin only' };
+  const sh = ss_().getSheetByName('Devices'), n = sh.getLastRow() - 1;
+  const list = n > 0 ? sh.getRange(2, 1, n, 4).getValues().map(r => ({ name: String(r[0]), id: String(r[1]), lastSeen: Number(r[2]) || 0, user: String(r[3]) })) : [];
+  return { ok: true, devices: list };
+}
+function releaseDevice_(au, req) {
+  if (au.u.role !== 'admin') return { ok: false, error: 'Admin only' };
+  const sh = ss_().getSheetByName('Devices'), n = sh.getLastRow() - 1, rows = n > 0 ? sh.getRange(2, 1, n, 4).getValues() : [];
+  const i = rows.findIndex(r => String(r[0]).toUpperCase() === String(req.name || '').toUpperCase());
+  if (i >= 0) sh.deleteRow(i + 2);
+  return { ok: true };
+}
+
+/* ======================= request router ======================= */
+function doPost(e) {
+  let req;
+  try { req = JSON.parse(e.postData.contents); } catch (x) { return out({ ok: false, error: 'Bad request' }); }
+  if (!req || req.key !== API_KEY) return out({ ok: false, error: 'Unauthorised' });
+  if (!P.getProperty('SS_ID')) return out({ ok: false, error: 'Cloud not set up: run setup() once in the Apps Script editor' });
+  try {
+    const a = req.action;
+    if (a === 'ping') return out({ ok: true, now: Date.now(), version: '2.1' });
+    if (a === 'login') return out(doLogin_(req));
+    const au = verify_(req.token);
+    if (!au) return out({ ok: false, error: 'Session expired. Sign in again.', auth: true });
+    let res;
+    if (a === 'stock') res = doStock_(req);
+    else if (a === 'pull') res = doPull_(au, req);
+    else if (a === 'users') res = doUsers_(au);
+    else if (a === 'devices') res = listDevices_(au);
+    else if (a === 'sync') res = withLock_(() => doSync_(au, req));
+    else if (a === 'saveUser') res = withLock_(() => saveUser_(au, req));
+    else if (a === 'device') res = withLock_(() => { const r = touchDevice_(ss_(), au, req.device); return r.ok ? { ok: true } : { ok: false, error: r.error, conflict: r.conflict }; });
+    else if (a === 'releaseDevice') res = withLock_(() => releaseDevice_(au, req));
+    else return out({ ok: false, error: 'Unknown action' });
+    if (res && res.ok && au.e - Date.now() < (TOKEN_DAYS - 5) * 864e5) res.token = sign_({ u: au.u.id, e: Date.now() + TOKEN_DAYS * 864e5 });
+    return out(res);
+  } catch (err) {
+    console.error(err);
+    return out({ ok: false, error: err && err.pub ? err.message : 'Request could not be completed. Try again.' });
+  }
+}
+
+/* ======================= stock snapshot (cache) ======================= */
+function putStockCache_(s) {
+  const j = JSON.stringify(s.q), parts = [], o = {};
+  for (let i = 0; i < j.length; i += 90000) parts.push(j.slice(i, i + 90000));
+  if (!parts.length) parts.push('{}');
+  o.STOCK_N = String(parts.length); o.STOCK_V = String(s.v); o.STOCK_S = String(s.seq);
+  parts.forEach((p, i) => o['STOCK_' + i] = p);
+  CC.putAll(o, 21600);
+}
+function getStockCache_() {
+  const n = Number(CC.get('STOCK_N')); if (!n) return null;
+  const keys = ['STOCK_V', 'STOCK_S']; for (let i = 0; i < n; i++) keys.push('STOCK_' + i);
+  const g = CC.getAll(keys); let j = '';
+  for (let i = 0; i < n; i++) { if (g['STOCK_' + i] == null) return null; j += g['STOCK_' + i]; }
+  if (g.STOCK_V == null) return null;
+  try { return { v: Number(g.STOCK_V), seq: Number(g.STOCK_S) || 0, q: JSON.parse(j) }; } catch (e) { return null; }
+}
+function stockFromSheet_() {
+  const cs = ss_().getSheetByName('CurrentStock'), n = cs.getLastRow() - 1, q = {};
+  if (n > 0) cs.getRange(2, 1, n, 2).getValues().forEach(r => { const id = String(r[0]); if (id && id !== '__cp__') q[id] = Number(r[1]) || 0; });
+  return q;
+}
+function publishStock_(q, changed) {
+  let v = Number(P.getProperty('SVER')) || 0;
+  if (changed) { v++; P.setProperty('SVER', String(v)); }
+  if (!q) { const c = getStockCache_(); q = c ? c.q : stockFromSheet_(); }
+  const s = { v: v, seq: Number(P.getProperty('SEQ_DONE')) || 0, q: q };
+  putStockCache_(s);
+  return s;
+}
+function doStock_(req) {
+  let s = getStockCache_();
+  if (!s) { s = { v: Number(P.getProperty('SVER')) || 0, seq: Number(P.getProperty('SEQ_DONE')) || 0, q: stockFromSheet_() }; putStockCache_(s); }
+  if (Number(req.v) === s.v) return { ok: true, same: true, v: s.v, seq: s.seq, now: Date.now() };
+  return { ok: true, v: s.v, seq: s.seq, q: s.q, now: Date.now() };
+}
+
+/* ======================= stock checkpoint ======================= */
+/* CurrentStock row 2 is '__cp__' whose qty is the last StockMovements row already applied. New quantities and the
+   checkpoint are written in ONE setValues call, so they can never disagree. Caller holds the lock. */
+function applyStock_(ss) {
+  const mv = ss.getSheetByName('StockMovements'), cs = ss.getSheetByName('CurrentStock'), last = mv.getLastRow(), n = cs.getLastRow() - 1;
+  const data = n > 0 ? cs.getRange(2, 1, n, 4).getValues() : [];
+  let cpI = data.findIndex(r => String(r[0]) === '__cp__');
+  if (cpI < 0) { data.unshift(['__cp__', 1, '', Date.now()]); cpI = 0; }
+  const cp = Number(data[cpI][1]) || 1;
+  if (last <= cp) return null;
+  const idx = {}; data.forEach((r, i) => idx[String(r[0])] = i);
+  const now = Date.now();
+  for (let from = cp + 1; from <= last; from += 2000) {
+    const cnt = Math.min(2000, last - from + 1);
+    mv.getRange(from, 1, cnt, 12).getValues().forEach(r => {
+      const item = String(r[1] || ''), q = Number(r[2]) || 0;
+      if (!item || !q) return;
+      if (idx[item] === undefined) { idx[item] = data.length; data.push([item, 0, '', now]); }
+      const row = data[idx[item]];
+      row[1] = Math.round((Number(row[1]) + q) * 1e6) / 1e6; row[3] = now;
+      if (!row[2] && r[11]) row[2] = String(r[11]);
+    });
+  }
+  data[cpI][1] = last; data[cpI][3] = now;
+  ensureRows_(cs, data.length + 1);
+  cs.getRange(2, 1, data.length, 4).setValues(data);
+  const q = {}; data.forEach(r => { const id = String(r[0]); if (id && id !== '__cp__') q[id] = Number(r[1]) || 0; });
+  return { q: q };
+}
+function recountCompute_(ss) {
+  const mv = ss.getSheetByName('StockMovements'), last = mv.getLastRow(), q = {}, names = {};
+  for (let from = 2; from <= last; from += 2000) {
+    const cnt = Math.min(2000, last - from + 1);
+    mv.getRange(from, 1, cnt, 12).getValues().forEach(r => { const it = String(r[1] || ''), n = Number(r[2]) || 0; if (!it) return; q[it] = (q[it] || 0) + n; if (r[11]) names[it] = String(r[11]); });
+  }
+  Object.keys(q).forEach(k => q[k] = Math.round(q[k] * 1e6) / 1e6);
+  return { q: q, names: names, last: Math.max(1, last) };
+}
+function writeStock_(ss, rc) {
+  const cs = ss.getSheetByName('CurrentStock'), now = Date.now(), data = [['__cp__', rc.last, '', now]];
+  Object.keys(rc.q).forEach(k => data.push([k, rc.q[k], rc.names[k] || '', now]));
+  const old = cs.getLastRow() - 1;
+  ensureRows_(cs, data.length + 1);
+  cs.getRange(2, 1, data.length, 4).setValues(data);
+  if (old > data.length) cs.getRange(2 + data.length, 1, old - data.length, 4).clearContent();
+}
+function sameQ_(a, b) {
+  const ks = {}; Object.keys(a).concat(Object.keys(b)).forEach(k => ks[k] = 1);
+  return Object.keys(ks).every(k => Math.abs((a[k] || 0) - (b[k] || 0)) < 1e-9);
+}
+function tick() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(20000)) return;
+  try {
+    if (!P.getProperty('SS_ID')) return;
+    const ss = ss_(); applyStock_(ss);
+    const seq = P.getProperty('SEQ') || '0', seqMoved = P.getProperty('SEQ_DONE') !== seq;
+    if (seqMoved) P.setProperty('SEQ_DONE', seq);
+    const c = getStockCache_(), q = stockFromSheet_();
+    if (!c || seqMoved || !sameQ_(c.q, q)) publishStock_(q, !c || !sameQ_(c.q, q));
+  } finally { lock.releaseLock(); }
+}
+function nightlyAudit() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return;
+  try {
+    const ss = ss_(), rc = recountCompute_(ss), cur = stockFromSheet_();
+    const ids = {}; Object.keys(rc.q).concat(Object.keys(cur)).forEach(k => ids[k] = 1);
+    const bad = Object.keys(ids).filter(k => Math.abs((rc.q[k] || 0) - (cur[k] || 0)) > 1e-6);
+    if (bad.length) { writeStock_(ss, rc); publishStock_(rc.q, true); log_(ss, 'AUDIT', 'Stock drift repaired for ' + bad.length + ' items: ' + bad.slice(0, 20).join(', ')); }
+    else log_(ss, 'AUDIT', 'Stock recount matches (' + Object.keys(rc.q).length + ' items)');
+  } finally { lock.releaseLock(); }
+}
